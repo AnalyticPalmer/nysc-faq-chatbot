@@ -13,6 +13,11 @@ from src.chat_engine import (
 from src.embedding_model import load_embedding_model
 from src.logger import logger
 from src.retriever import load_vector_store
+from src.vector_store import (
+    FAISS_INDEX_PATH,
+    METADATA_PATH,
+    build_vector_store,
+)
 
 
 class NYSCChatService:
@@ -24,6 +29,26 @@ class NYSCChatService:
 
         try:
             load_dotenv()
+
+            if (
+                not FAISS_INDEX_PATH.exists()
+                or not METADATA_PATH.exists()
+            ):
+                logger.info(
+                    "Vector store is missing and will be created."
+                )
+
+                try:
+                    build_vector_store()
+                except Exception as error:
+                    logger.exception(
+                        "Automatic vector store creation failed."
+                    )
+                    raise RuntimeError(
+                        "The vector store could not be initialized."
+                    ) from error
+
+                logger.info("Vector store created successfully.")
 
             self.index, self.documents = load_vector_store()
             self.embedding_model = load_embedding_model()

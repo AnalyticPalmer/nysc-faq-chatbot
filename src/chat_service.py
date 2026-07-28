@@ -88,6 +88,112 @@ class NYSCChatService:
 
         return formatted_sources
 
+    @staticmethod
+    def detect_conversational_intent(question: str) -> str | None:
+        """Detect a simple conversational intent from normalized text."""
+        normalized_question = "".join(
+            character
+            for character in question.lower().strip()
+            if character.isalnum() or character.isspace()
+        )
+        normalized_question = " ".join(normalized_question.split())
+
+        intent_phrases = {
+            "greeting": {
+                "hi",
+                "hello",
+                "hey",
+                "good morning",
+                "good afternoon",
+                "good evening",
+                "how are you",
+            },
+            "thanks": {
+                "thanks",
+                "thank you",
+                "thank you very much",
+                "appreciated",
+                "that was helpful",
+            },
+            "farewell": {
+                "bye",
+                "goodbye",
+                "see you",
+                "talk later",
+                "have a nice day",
+            },
+            "help": {
+                "help",
+                "what can you do",
+                "how can you help me",
+                "what do you know",
+                "what questions can i ask",
+            },
+            "about": {
+                "who are you",
+                "what are you",
+                "are you an official nysc chatbot",
+                "tell me about this chatbot",
+            },
+        }
+
+        for intent, phrases in intent_phrases.items():
+            if normalized_question in phrases:
+                return intent
+
+        return None
+
+    @staticmethod
+    def build_conversational_response(intent: str) -> dict:
+        """Build a structured response for a conversational intent."""
+        responses = {
+            "greeting": (
+                "Hello! Welcome to the NYSC FAQ Assistant. I can help "
+                "with registration, mobilization, orientation camp, "
+                "relocation, PPA, CDS, monthly clearance, exemption, "
+                "passing out, and other common NYSC questions. How can "
+                "I help you today?"
+            ),
+            "thanks": (
+                "You are welcome. I am glad I could help. Feel free to "
+                "ask another NYSC-related question."
+            ),
+            "farewell": (
+                "Goodbye. I wish you the best with your NYSC journey. "
+                "You can return anytime you need more information."
+            ),
+            "help": (
+                "You can ask me about NYSC registration, mobilization, "
+                "Senate list, call-up letters, orientation camp, "
+                "relocation, PPA, CDS, monthly clearance, exemption, "
+                "passing out, foreign-trained graduate requirements, "
+                "and portal support."
+            ),
+            "about": (
+                "I am an independent AI-powered NYSC FAQ Assistant built "
+                "as an educational AI/ML capstone project. I use a "
+                "verified FAQ knowledge base, semantic search, FAISS, "
+                "Sentence Transformers, and Google Gemini. I am not an "
+                "official NYSC platform."
+            ),
+        }
+
+        if intent not in responses:
+            raise ValueError(
+                f"Unsupported conversational intent: {intent}"
+            )
+
+        return {
+            "question": "",
+            "answer": responses[intent],
+            "confidence": 100.0,
+            "sources": [],
+            "response_time": 0.0,
+            "success": True,
+            "error": None,
+            "response_type": "conversational",
+        }
+
     def ask(self, question: str) -> dict:
         """Answer one NYSC question and return a structured result.
 
@@ -116,6 +222,17 @@ class NYSCChatService:
             len(cleaned_question),
             self.model_name,
         )
+
+        conversational_intent = self.detect_conversational_intent(
+            cleaned_question
+        )
+
+        if conversational_intent:
+            response = self.build_conversational_response(
+                conversational_intent
+            )
+            response["question"] = cleaned_question
+            return response
 
         start_time = time.perf_counter()
 
@@ -155,6 +272,7 @@ class NYSCChatService:
                 "response_time": round(response_time, 2),
                 "success": True,
                 "error": None,
+                "response_type": "rag",
             }
         except Exception as error:
             response_time = time.perf_counter() - start_time
@@ -184,6 +302,7 @@ class NYSCChatService:
                 "response_time": round(response_time, 2),
                 "success": False,
                 "error": safe_error,
+                "response_type": "error",
             }
 
 

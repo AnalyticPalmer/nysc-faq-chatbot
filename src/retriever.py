@@ -5,12 +5,15 @@ from pathlib import Path
 
 import faiss
 import numpy as np
+from sentence_transformers import SentenceTransformer
 
 from src.embedding_model import generate_embeddings, load_embedding_model
 
 
-FAISS_INDEX_PATH = Path("vector_store/nysc_faq.index")
-METADATA_PATH = Path("vector_store/metadata.json")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+VECTOR_STORE_DIR = PROJECT_ROOT / "vector_store"
+FAISS_INDEX_PATH = VECTOR_STORE_DIR / "nysc_faq.index"
+METADATA_PATH = VECTOR_STORE_DIR / "metadata.json"
 DEFAULT_TOP_K = 3
 
 
@@ -61,9 +64,9 @@ def convert_score_to_percentage(score: float) -> float:
 
 def search_faq(
     question: str,
-    index,
+    index: faiss.Index,
     documents: list[dict],
-    model,
+    model: SentenceTransformer,
     top_k: int = DEFAULT_TOP_K,
 ) -> list[dict]:
     """Search the saved FAQ vectors for documents relevant to a question.

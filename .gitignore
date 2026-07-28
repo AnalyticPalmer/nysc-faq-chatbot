@@ -1,5 +1,7 @@
 # Virtual environment
 NYSCHATBOT/
+.venv/
+venv/
 
 # Secret environment variables
 .env
@@ -7,12 +9,19 @@ NYSCHATBOT/
 # Python cache files
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Log files
 logs/*.log
 
-# Generated vector database files
+# Keep the production vector store, but ignore any other generated files.
 vector_store/*
+!vector_store/metadata.json
+!vector_store/nysc_faq.index
 
 # VS Code settings
 .vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db

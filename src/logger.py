@@ -4,7 +4,8 @@ import logging
 from pathlib import Path
 
 
-LOG_DIR = Path("logs")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+LOG_DIR = PROJECT_ROOT / "logs"
 LOG_FILE = LOG_DIR / "chatbot.log"
 LOGGER_NAME = "NYSCFAQChatbot"
 

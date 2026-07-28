@@ -19,14 +19,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FAQ_FILE = PROJECT_ROOT / "data" / "faq" / "nysc_faq.json"
 
 
-def is_empty(value):
+def is_empty(value: object) -> bool:
     """Return True when a value is missing useful content."""
     return value is None or (
         isinstance(value, str) and not value.strip()
     )
 
 
-def validate_faq():
+def validate_faq() -> None:
     """Load the FAQ dataset, validate its records, and print a summary."""
     try:
         with FAQ_FILE.open("r", encoding="utf-8") as file:

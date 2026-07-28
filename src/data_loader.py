@@ -14,7 +14,7 @@ FAQ_DATA_PATH = (
 )
 
 
-def load_faq_data():
+def load_faq_data() -> list[dict]:
     """Load and return the FAQ records from the JSON dataset.
 
     Raises:
@@ -39,7 +39,7 @@ def load_faq_data():
     return faq_records
 
 
-def main():
+def main() -> None:
     """Load the FAQ data and print a short dataset preview."""
     try:
         faq_records = load_faq_data()

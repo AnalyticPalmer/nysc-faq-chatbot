@@ -8,10 +8,13 @@ from src.embedding_model import load_embedding_model
 from src.retriever import load_vector_store, search_faq
 
 
-EVALUATION_DATA_PATH = Path(
-    "data/processed/evaluation_questions.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+EVALUATION_DATA_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "evaluation_questions.json"
 )
-EVALUATION_REPORT_PATH = Path("reports/evaluation_report.json")
+EVALUATION_REPORT_PATH = (
+    PROJECT_ROOT / "reports" / "evaluation_report.json"
+)
 
 
 def load_evaluation_data() -> list[dict]:

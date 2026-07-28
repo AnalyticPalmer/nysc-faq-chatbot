@@ -12,7 +12,8 @@ from src.embedding_model import generate_embeddings, load_embedding_model
 from src.text_chunker import chunk_documents
 
 
-VECTOR_STORE_DIR = Path("vector_store")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+VECTOR_STORE_DIR = PROJECT_ROOT / "vector_store"
 FAISS_INDEX_PATH = VECTOR_STORE_DIR / "nysc_faq.index"
 METADATA_PATH = VECTOR_STORE_DIR / "metadata.json"
 

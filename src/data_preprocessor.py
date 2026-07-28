@@ -3,7 +3,7 @@
 from src.data_loader import load_faq_data
 
 
-def clean_text(value):
+def clean_text(value: object) -> str:
     """Convert a value to clean text with unnecessary spaces removed."""
     if value is None:
         return ""
@@ -11,7 +11,7 @@ def clean_text(value):
     return " ".join(str(value).split())
 
 
-def prepare_faq_documents(records):
+def prepare_faq_documents(records: list[dict]) -> list[dict]:
     """Convert FAQ records into text documents with useful metadata.
 
     Records without a question or answer are skipped because they do not
@@ -56,7 +56,7 @@ def prepare_faq_documents(records):
     return prepared_documents
 
 
-def main():
+def main() -> None:
     """Load FAQ records, prepare them, and print a short preview."""
     faq_records = load_faq_data()
     prepared_documents = prepare_faq_documents(faq_records)

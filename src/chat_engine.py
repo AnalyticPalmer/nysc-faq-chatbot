@@ -17,7 +17,7 @@ UNAVAILABLE_RESPONSE = (
 )
 
 
-def load_gemini_client():
+def load_gemini_client() -> genai.Client:
     """Load environment variables and create a Gemini API client.
 
     Raises:
@@ -89,7 +89,7 @@ User question:
 
 def generate_answer(
     question: str,
-    client,
+    client: genai.Client,
     model_name: str,
     context: str,
 ) -> str:
@@ -130,10 +130,10 @@ def generate_answer(
 
 def answer_question(
     question: str,
-    index,
+    index: object,
     documents: list[dict],
-    embedding_model,
-    gemini_client,
+    embedding_model: object,
+    gemini_client: genai.Client,
     model_name: str,
 ) -> dict:
     """Retrieve relevant FAQs and generate a grounded Gemini answer."""

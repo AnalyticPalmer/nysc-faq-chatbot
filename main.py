@@ -1,7 +1,7 @@
 """Simple entry point for the NYSC FAQ Chatbot project."""
 
 
-def main():
+def main() -> None:
     """Confirm that the initial project setup is working."""
     print("NYSC FAQ Chatbot project setup successful.")
 

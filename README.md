@@ -1,5 +1,33 @@
 # NYSC FAQ Chatbot
 
+# NYSC FAQ Chatbot
+
+An AI-powered Retrieval-Augmented Generation (RAG) assistant that answers common NYSC questions using semantic search and Google Gemini.
+
+---
+
+## Live Demo
+
+The application is deployed and publicly accessible.
+
+**Live URL**
+
+https://nysc-faq-assistant.streamlit.app/
+
+---
+
+## Features
+
+- Retrieval-Augmented Generation (RAG)
+- Semantic Search with FAISS
+- Sentence Transformer Embeddings
+- Google Gemini Integration
+- Source Attribution
+- Confidence Scores
+- Response Time Tracking
+- Conversation History
+- Professional Streamlit Interface
+- 
 ## Project Description
 
 NYSC FAQ Chatbot is a Retrieval-Augmented Generation (RAG) application that

@@ -11,6 +11,7 @@ from src.chat_engine import (
     load_gemini_client,
 )
 from src.embedding_model import load_embedding_model
+from src.logger import logger
 from src.retriever import load_vector_store
 
 
@@ -19,15 +20,24 @@ class NYSCChatService:
 
     def __init__(self) -> None:
         """Load the vector store, embedding model, and Gemini client."""
-        load_dotenv()
+        logger.info("Chat service initialization started.")
 
-        self.index, self.documents = load_vector_store()
-        self.embedding_model = load_embedding_model()
-        self.gemini_client = load_gemini_client()
-        self.model_name = os.getenv(
-            "GEMINI_MODEL",
-            DEFAULT_MODEL_NAME,
-        )
+        try:
+            load_dotenv()
+
+            self.index, self.documents = load_vector_store()
+            self.embedding_model = load_embedding_model()
+            self.gemini_client = load_gemini_client()
+            self.model_name = os.getenv(
+                "GEMINI_MODEL",
+                DEFAULT_MODEL_NAME,
+            )
+        except Exception:
+            # Do not include environment values or credentials in messages.
+            logger.exception("Chat service initialization failed.")
+            raise
+
+        logger.info("Chat service initialization completed successfully.")
 
     @staticmethod
     def format_sources(sources: list[dict]) -> list[dict]:
@@ -75,6 +85,13 @@ class NYSCChatService:
         if not cleaned_question:
             raise ValueError("question cannot be empty.")
 
+        # Record only safe request details, never the question itself.
+        logger.info(
+            "Valid question received | character_length=%d | model=%s",
+            len(cleaned_question),
+            self.model_name,
+        )
+
         start_time = time.perf_counter()
 
         try:
@@ -88,23 +105,41 @@ class NYSCChatService:
             )
 
             response_time = time.perf_counter() - start_time
+            confidence = round(
+                float(result.get("confidence", 0.0)),
+                2,
+            )
+            formatted_sources = self.format_sources(
+                result.get("sources", [])
+            )
+
+            logger.info(
+                "Question processed | success=%s | confidence=%.2f | "
+                "response_time=%.2f | source_count=%d",
+                True,
+                confidence,
+                response_time,
+                len(formatted_sources),
+            )
 
             return {
                 "question": cleaned_question,
                 "answer": result["answer"],
-                "confidence": round(
-                    float(result.get("confidence", 0.0)),
-                    2,
-                ),
-                "sources": self.format_sources(
-                    result.get("sources", [])
-                ),
+                "confidence": confidence,
+                "sources": formatted_sources,
                 "response_time": round(response_time, 2),
                 "success": True,
                 "error": None,
             }
         except Exception as error:
             response_time = time.perf_counter() - start_time
+
+            logger.exception(
+                "Question processing failed | success=%s | "
+                "response_time=%.2f",
+                False,
+                response_time,
+            )
 
             # Report only the error type so credentials or sensitive
             # request details cannot appear in the returned message.

@@ -1,10 +1,10 @@
 {
   "summary": {
     "total_questions": 20,
-    "correct_results": 18,
-    "incorrect_results": 2,
-    "accuracy": 90.0,
-    "average_confidence": 83.46,
+    "correct_results": 19,
+    "incorrect_results": 1,
+    "accuracy": 95.0,
+    "average_confidence": 86.39,
     "average_response_time": 0.04
   },
   "results": [
@@ -15,7 +15,7 @@
       "retrieved_category": "Registration",
       "confidence": 80.69,
       "correct": true,
-      "response_time": 0.21
+      "response_time": 0.36
     },
     {
       "id": "eval-002",
@@ -40,18 +40,18 @@
       "question": "Why is my name not appearing on the Senate list?",
       "expected_category": "Senate List",
       "retrieved_category": "Senate List",
-      "confidence": 80.6,
+      "confidence": 83.86,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-005",
       "question": "Where can I download my NYSC call-up letter?",
       "expected_category": "Call-up Letter",
       "retrieved_category": "Call-up Letter",
-      "confidence": 86.63,
+      "confidence": 87.33,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-006",
@@ -60,7 +60,7 @@
       "retrieved_category": "Orientation Camp",
       "confidence": 93.44,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-007",
@@ -69,7 +69,7 @@
       "retrieved_category": "Camp Requirements",
       "confidence": 78.24,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-008",
@@ -87,7 +87,7 @@
       "retrieved_category": "Relocation",
       "confidence": 89.93,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-010",
@@ -96,14 +96,14 @@
       "retrieved_category": "Relocation",
       "confidence": 80.21,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-011",
       "question": "What does monthly clearance mean?",
       "expected_category": "Monthly Clearance",
       "retrieved_category": "Monthly Clearance",
-      "confidence": 81.26,
+      "confidence": 83.51,
       "correct": true,
       "response_time": 0.02
     },
@@ -111,28 +111,28 @@
       "id": "eval-012",
       "question": "What is a PPA in NYSC?",
       "expected_category": "Place of Primary Assignment",
-      "retrieved_category": "Community Development Service",
-      "confidence": 69.91,
-      "correct": false,
-      "response_time": 0.02
+      "retrieved_category": "Place of Primary Assignment",
+      "confidence": 84.09,
+      "correct": true,
+      "response_time": 0.03
     },
     {
       "id": "eval-013",
       "question": "What is CDS and why do corps members participate in it?",
       "expected_category": "Community Development Service",
       "retrieved_category": "Community Development Service",
-      "confidence": 67.0,
+      "confidence": 87.89,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-014",
       "question": "What happens during the NYSC passing-out stage?",
       "expected_category": "Passing Out",
       "retrieved_category": "Passing Out",
-      "confidence": 79.54,
+      "confidence": 81.51,
       "correct": true,
-      "response_time": 0.02
+      "response_time": 0.06
     },
     {
       "id": "eval-015",
@@ -141,7 +141,7 @@
       "retrieved_category": "Exemption",
       "confidence": 84.88,
       "correct": true,
-      "response_time": 0.02
+      "response_time": 0.04
     },
     {
       "id": "eval-016",
@@ -150,7 +150,7 @@
       "retrieved_category": "Exemption",
       "confidence": 92.87,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-017",
@@ -175,9 +175,9 @@
       "question": "What should I do if the NYSC portal is not opening?",
       "expected_category": "Portal Support",
       "retrieved_category": "Portal Support",
-      "confidence": 72.09,
+      "confidence": 87.6,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-020",

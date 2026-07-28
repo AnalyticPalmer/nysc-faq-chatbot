@@ -223,5 +223,230 @@
     "source_title": "NYSC Registration Requirements",
     "source_url": "https://www.nysc.gov.ng/mobreg.html",
     "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-026",
+    "category": "Place of Primary Assignment",
+    "question": "What is a PPA in NYSC?",
+    "answer": "PPA means Place of Primary Assignment, where a corps member performs assigned duties after orientation. Primary assignment is one of the main segments of the NYSC service year.",
+    "source_title": "NYSC Service Year Overview",
+    "source_url": "https://www.nysc.gov.ng/serviceyear.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-027",
+    "category": "Place of Primary Assignment",
+    "question": "Can I reject my PPA?",
+    "answer": "NYSC bye-laws state that a corps member must not refuse a posting to primary assignment or induce an employer to reject the posting. A concern about a posting should be raised through the proper NYSC channel instead of refusing it.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-028",
+    "category": "Place of Primary Assignment",
+    "question": "Can my PPA be changed?",
+    "answer": "A PPA may change through an official NYSC reposting process; a corps member should not change it independently. Raise any grievance first with the corps employer or State Coordinator and follow the direction given by NYSC.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-029",
+    "category": "Place of Primary Assignment",
+    "question": "Who issues a PPA letter?",
+    "answer": "The Place of Primary Assignment letter is an NYSC service document. Where a corps member is reposted after camp, the updated PPA letter can be printed through the official NYSC dashboard.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-030",
+    "category": "Community Development Service",
+    "question": "What is CDS?",
+    "answer": "CDS means Community Development Service, a segment of the NYSC service year. It uses the skills, creativity and initiative of corps members to support development in their host communities.",
+    "source_title": "NYSC Service Year Overview",
+    "source_url": "https://www.nysc.gov.ng/serviceyear.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-031",
+    "category": "Community Development Service",
+    "question": "Is CDS compulsory?",
+    "answer": "CDS is one of the four main segments of the NYSC service year. Corps members are expected to participate satisfactorily in the service-year programmes before qualifying for a Certificate of National Service.",
+    "source_title": "NYSC Service Year Overview",
+    "source_url": "https://www.nysc.gov.ng/serviceyear.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-032",
+    "category": "Community Development Service",
+    "question": "Can I miss CDS?",
+    "answer": "Corps members are expected to participate in assigned CDS activities as part of the service year. If you cannot attend for a valid reason, contact your NYSC inspector and obtain the required permission rather than staying away without approval.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-033",
+    "category": "Monthly Clearance",
+    "question": "What happens if I miss monthly clearance?",
+    "answer": "Monthly clearance is used by NYSC to confirm a corps member's continuing participation in service. If you miss it, contact your Local Government Inspector promptly and follow the official instruction given for your case.",
+    "source_title": "NYSC Annual Report",
+    "source_url": "https://www.nysc.gov.ng/downloads/report.pdf",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-034",
+    "category": "Call-up Letter",
+    "question": "How do I replace a lost call-up letter?",
+    "answer": "Sign in to your official NYSC dashboard and use the available call-up letter printing service to obtain another copy. If the option is unavailable, contact NYSC through an official support channel or your institution.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-035",
+    "category": "Senate List",
+    "question": "Why is my name not on the Senate list?",
+    "answer": "For locally trained graduates, the institution submits the Senate or Academic Board approved result list to NYSC. NYSC advises anyone whose name is not found to contact the institution for correction or clarification.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-036",
+    "category": "Senate List",
+    "question": "Can I register without my name on the Senate list?",
+    "answer": "No, a locally trained graduate can access NYSC registration only when the name appears on the approved result list submitted by the institution. Contact your institution if your record is missing or incorrect.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-037",
+    "category": "Orientation Camp",
+    "question": "What happens if I miss orientation camp?",
+    "answer": "Orientation is a compulsory segment of the NYSC service year, so a prospective corps member who cannot report should not assume the deployment remains valid. Check the official dashboard and follow NYSC instructions on revalidation for a later exercise.",
+    "source_title": "NYSC Corps Mobilization",
+    "source_url": "https://www.nysc.gov.ng/corpmob.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-038",
+    "category": "Orientation Camp",
+    "question": "Can someone attend camp on my behalf?",
+    "answer": "No, camp registration and participation are personal and cannot be completed by proxy. NYSC uses the biometrics captured during online registration to verify each prospective corps member at camp.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-039",
+    "category": "Orientation Camp",
+    "question": "Can I leave camp before swearing-in?",
+    "answer": "A prospective corps member should not leave orientation camp or miss an official activity without written consent from the State Coordinator. Ask the appropriate camp officials for permission before leaving for any reason.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-040",
+    "category": "Orientation Camp",
+    "question": "Can I leave camp after swearing-in?",
+    "answer": "Swearing-in does not remove the requirement to remain in camp and attend official activities. Written consent from the State Coordinator is required before leaving orientation camp.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-041",
+    "category": "Camp Requirements",
+    "question": "What should I wear to camp?",
+    "answer": "NYSC requires corps members to wear the uniforms provided for the relevant camp activities. Also follow the clothing and kit instructions printed on your call-up letter and communicated by camp officials.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-042",
+    "category": "Camp Requirements",
+    "question": "Can I take electronic devices to camp?",
+    "answer": "Check your call-up letter and current camp instructions before taking electronic devices because NYSC may issue operational guidance for each camp. The bye-laws state that corps members must not make or answer calls while on parade and must obey camp officials.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-043",
+    "category": "Camp Requirements",
+    "question": "What items are prohibited in camp?",
+    "answer": "NYSC bye-laws prohibit firearms, ammunition and hard drugs in orientation camp, and they also disallow vehicles, motorcycles and animal pets in camp. Follow the call-up letter and camp officials for any additional current restrictions.",
+    "source_title": "NYSC Bye-Laws",
+    "source_url": "https://www.nysc.gov.ng/downloads/nysc-bye-laws.php",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-044",
+    "category": "Portal Support",
+    "question": "What should I do if the NYSC portal is unavailable?",
+    "answer": "Use only the official NYSC portal and try again after confirming that your internet connection is working. If the problem continues, use the support information published on the official NYSC website and do not share your password with anyone.",
+    "source_title": "NYSC Online Registration Support Lines",
+    "source_url": "https://www.nysc.gov.ng/supportline.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-045",
+    "category": "Portal Support",
+    "question": "Can I correct mistakes after NYSC registration?",
+    "answer": "The NYSC dashboard provides self-service requests for specified corrections, including name spelling, date of birth, course of study, class of degree and qualification. Each correction follows its own approval process, and some requests require action by the graduate's institution.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-046",
+    "category": "Portal Support",
+    "question": "How do I reset my NYSC portal password?",
+    "answer": "Use the password-recovery option on the official NYSC portal and follow the instructions linked to your registered email address. Keep the new login details private and use official NYSC support if recovery is unsuccessful.",
+    "source_title": "NYSC Online Portal",
+    "source_url": "https://portal.nysc.org.ng/nysc1/",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-047",
+    "category": "Portal Support",
+    "question": "Can I print my NYSC green card again?",
+    "answer": "Sign in to your official NYSC dashboard and use the available print option for your registration slip or green card. If the document is not available, contact official NYSC support rather than creating or altering a copy.",
+    "source_title": "NYSC Online Portal",
+    "source_url": "https://portal.nysc.org.ng/nysc1/",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-048",
+    "category": "Call-up Letter",
+    "question": "Can I print my call-up letter again?",
+    "answer": "Yes, call-up letter printing is listed among the self-service features on the NYSC dashboard. Sign in through the official portal and print the document available in your account.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-049",
+    "category": "Passing Out",
+    "question": "What happens after passing out?",
+    "answer": "Passing out concludes the required NYSC service activities for a corps member who has been duly discharged. Eligible corps members receive their Certificate of National Service through the NYSC certification process.",
+    "source_title": "NYSC Certificate of National Service Collection",
+    "source_url": "https://www.nysc.gov.ng/certcollectcns.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-050",
+    "category": "Passing Out",
+    "question": "How do I collect my NYSC Certificate of National Service?",
+    "answer": "NYSC issues certificates to deserving corps members through State Secretariats and State Certification Officers. A corps member must be duly discharged and present the required employer clearance, CDS clearance and NYSC identity card; the certificate is not issued by proxy.",
+    "source_title": "NYSC Certificate of National Service Collection",
+    "source_url": "https://www.nysc.gov.ng/certcollectcns.html",
+    "date_verified": "2026-07-28"
   }
 ]

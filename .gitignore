@@ -1,0 +1,18 @@
+# Virtual environment
+NYSCHATBOT/
+
+# Secret environment variables
+.env
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Log files
+logs/*.log
+
+# Generated vector database files
+vector_store/*
+
+# VS Code settings
+.vscode/

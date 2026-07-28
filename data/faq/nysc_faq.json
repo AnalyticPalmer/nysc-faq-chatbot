@@ -1,0 +1,182 @@
+[
+  {
+    "id": "faq-001",
+    "category": "Registration",
+    "question": "What do I need before starting NYSC online registration?",
+    "answer": "You need a functional email address that you can access and a Nigerian mobile phone number. Keep your email address and password safe because you will use them to sign in to the NYSC portal.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-002",
+    "category": "Registration",
+    "question": "Can someone register for NYSC on my behalf?",
+    "answer": "No. NYSC does not allow registration by proxy. You must complete your own biometric capture because the same biometrics are used for verification at orientation camp.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-003",
+    "category": "Registration",
+    "question": "What type of passport photograph should I upload?",
+    "answer": "Use a clear photograph with a white or off-white background and no shadow. Your full face should be visible, centred, and fill the frame.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-004",
+    "category": "Mobilization",
+    "question": "How are Nigerian graduates mobilized for NYSC?",
+    "answer": "Corps-producing institutions submit approved graduate lists to NYSC. After the lists are processed, eligible locally and foreign-trained graduates register online through the official NYSC portal.",
+    "source_title": "NYSC Corps Mobilization",
+    "source_url": "https://www.nysc.gov.ng/corpmob.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-005",
+    "category": "Senate List",
+    "question": "Why must my name be on the Senate or Academic Board list?",
+    "answer": "A locally trained graduate can register only when the graduate's name appears on the Senate or Academic Board approved result list submitted by the institution.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-006",
+    "category": "Call-up Letter",
+    "question": "Where can I print my NYSC call-up letter?",
+    "answer": "Sign in to your dashboard on the official NYSC portal. Printing a call-up letter is one of the self-service options available to eligible prospective corps members.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-007",
+    "category": "Orientation Camp",
+    "question": "Do medical graduates need their professional licences at camp?",
+    "answer": "Yes. Prospective corps members in medical professions must bring their professional practising licences to orientation camp.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-008",
+    "category": "Camp Requirements",
+    "question": "Must foreign-trained graduates bring their documents to camp?",
+    "answer": "Yes. Foreign-trained graduates must bring the original documents uploaded during registration and translated versions of certificates that are not in English.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-009",
+    "category": "Camp Requirements",
+    "question": "Why is biometric verification important at orientation camp?",
+    "answer": "NYSC uses the biometrics captured during online registration to verify prospective corps members at camp. A person who cannot be verified will not be registered at the camp.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-010",
+    "category": "Relocation",
+    "question": "Can I apply for relocation after orientation camp?",
+    "answer": "Yes. Application for relocation after camp is available as a self-service option on the corps member's NYSC dashboard.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-011",
+    "category": "Relocation",
+    "question": "What documents support relocation to a husband's state of domicile?",
+    "answer": "NYSC lists a marriage certificate, newspaper evidence of change of name, a letter from the husband's employer, and the husband's means of identification as supporting documents.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-012",
+    "category": "Monthly Clearance",
+    "question": "Where should I follow instructions for monthly clearance?",
+    "answer": "Follow the instructions provided by your NYSC Local Government Inspector and check your official NYSC portal dashboard for any related service information.",
+    "source_title": "NYSC Online Portal",
+    "source_url": "https://portal.nysc.org.ng/nysc1/",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-013",
+    "category": "Place of Primary Assignment",
+    "question": "Can I print a Place of Primary Assignment letter online after reposting?",
+    "answer": "Yes. The NYSC dashboard provides a self-service option for printing a Place of Primary Assignment letter after camp reposting.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-014",
+    "category": "Community Development Service",
+    "question": "What is Community Development Service in NYSC?",
+    "answer": "Community Development Service is a part of the NYSC service year through which corps members take part in activities intended to support their host communities.",
+    "source_title": "NYSC Corps Mobilization",
+    "source_url": "https://www.nysc.gov.ng/corpmob.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-015",
+    "category": "Passing Out",
+    "question": "What does passing out mean in NYSC?",
+    "answer": "Passing out is the concluding stage of the service year. Corps members who satisfactorily complete the required service activities may be issued a Certificate of National Service.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-016",
+    "category": "Exemption",
+    "question": "Where does a locally trained graduate collect an exemption certificate?",
+    "answer": "A locally trained graduate who is exempted from service should collect the Certificate of Exemption from the institution of graduation.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-017",
+    "category": "Exemption",
+    "question": "How does a foreign-trained graduate collect an exemption certificate?",
+    "answer": "A foreign-trained graduate must present the original academic credentials and international passport for physical verification at the NYSC National Directorate Headquarters before the exemption certificate is issued.",
+    "source_title": "NYSC Foreign-Trained Graduate Requirements",
+    "source_url": "https://www.nysc.gov.ng/foreignmobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-018",
+    "category": "Foreign-Trained Graduates",
+    "question": "Which academic documents do foreign-trained graduates need?",
+    "answer": "NYSC requires original academic documents, including the first degree or HND certificate, a complete official transcript, and the applicable original O'level certificate. Downloaded certificates, statements of result, and attestation letters are not accepted.",
+    "source_title": "NYSC Foreign-Trained Graduate Requirements",
+    "source_url": "https://www.nysc.gov.ng/foreignmobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-019",
+    "category": "Foreign-Trained Graduates",
+    "question": "What passport information must a foreign-trained graduate provide?",
+    "answer": "The international passport should show the data page, entry visa to the country of study, travel dates connected to the study period, and residence permits or visas covering that period. If multiple passports were used, their data pages should be uploaded.",
+    "source_title": "NYSC Foreign-Trained Graduate Requirements",
+    "source_url": "https://www.nysc.gov.ng/foreignmobreg.html",
+    "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-020",
+    "category": "Portal Support",
+    "question": "What should I do if I notice a spelling mistake in my name after registration?",
+    "answer": "Sign in to your NYSC dashboard, choose the name-correction option, complete the required fields, and submit the request for approval. NYSC states that names cannot be added or removed through this process.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-27"
+  }
+]

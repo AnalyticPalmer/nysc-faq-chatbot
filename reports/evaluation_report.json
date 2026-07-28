@@ -5,7 +5,7 @@
     "incorrect_results": 1,
     "accuracy": 95.0,
     "average_confidence": 86.39,
-    "average_response_time": 0.04
+    "average_response_time": 0.03
   },
   "results": [
     {
@@ -15,7 +15,7 @@
       "retrieved_category": "Registration",
       "confidence": 80.69,
       "correct": true,
-      "response_time": 0.36
+      "response_time": 0.09
     },
     {
       "id": "eval-002",
@@ -33,7 +33,7 @@
       "retrieved_category": "Mobilization",
       "confidence": 81.61,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-004",
@@ -42,7 +42,7 @@
       "retrieved_category": "Senate List",
       "confidence": 83.86,
       "correct": true,
-      "response_time": 0.02
+      "response_time": 0.03
     },
     {
       "id": "eval-005",
@@ -60,7 +60,7 @@
       "retrieved_category": "Orientation Camp",
       "confidence": 93.44,
       "correct": true,
-      "response_time": 0.02
+      "response_time": 0.03
     },
     {
       "id": "eval-007",
@@ -114,7 +114,7 @@
       "retrieved_category": "Place of Primary Assignment",
       "confidence": 84.09,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-013",
@@ -123,7 +123,7 @@
       "retrieved_category": "Community Development Service",
       "confidence": 87.89,
       "correct": true,
-      "response_time": 0.02
+      "response_time": 0.03
     },
     {
       "id": "eval-014",
@@ -132,7 +132,7 @@
       "retrieved_category": "Passing Out",
       "confidence": 81.51,
       "correct": true,
-      "response_time": 0.06
+      "response_time": 0.02
     },
     {
       "id": "eval-015",
@@ -141,7 +141,7 @@
       "retrieved_category": "Exemption",
       "confidence": 84.88,
       "correct": true,
-      "response_time": 0.04
+      "response_time": 0.02
     },
     {
       "id": "eval-016",
@@ -159,7 +159,7 @@
       "retrieved_category": "Foreign-Trained Graduates",
       "confidence": 94.21,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-018",
@@ -168,7 +168,7 @@
       "retrieved_category": "Camp Requirements",
       "confidence": 90.18,
       "correct": false,
-      "response_time": 0.03
+      "response_time": 0.02
     },
     {
       "id": "eval-019",
@@ -186,7 +186,7 @@
       "retrieved_category": "Portal Support",
       "confidence": 94.11,
       "correct": true,
-      "response_time": 0.03
+      "response_time": 0.02
     }
   ]
 }

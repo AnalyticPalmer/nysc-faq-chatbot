@@ -1,0 +1,192 @@
+{
+  "summary": {
+    "total_questions": 20,
+    "correct_results": 18,
+    "incorrect_results": 2,
+    "accuracy": 90.0,
+    "average_confidence": 83.46,
+    "average_response_time": 0.04
+  },
+  "results": [
+    {
+      "id": "eval-001",
+      "question": "How can I sign up for NYSC?",
+      "expected_category": "Registration",
+      "retrieved_category": "Registration",
+      "confidence": 80.69,
+      "correct": true,
+      "response_time": 0.21
+    },
+    {
+      "id": "eval-002",
+      "question": "Can another person complete my NYSC registration for me?",
+      "expected_category": "Registration",
+      "retrieved_category": "Registration",
+      "confidence": 88.29,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-003",
+      "question": "How does my school submit my details for NYSC mobilization?",
+      "expected_category": "Mobilization",
+      "retrieved_category": "Mobilization",
+      "confidence": 81.61,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-004",
+      "question": "Why is my name not appearing on the Senate list?",
+      "expected_category": "Senate List",
+      "retrieved_category": "Senate List",
+      "confidence": 80.6,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-005",
+      "question": "Where can I download my NYSC call-up letter?",
+      "expected_category": "Call-up Letter",
+      "retrieved_category": "Call-up Letter",
+      "confidence": 86.63,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-006",
+      "question": "Do medical graduates need a practising licence at orientation camp?",
+      "expected_category": "Orientation Camp",
+      "retrieved_category": "Orientation Camp",
+      "confidence": 93.44,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-007",
+      "question": "What should I bring to orientation camp?",
+      "expected_category": "Camp Requirements",
+      "retrieved_category": "Camp Requirements",
+      "confidence": 78.24,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-008",
+      "question": "Are photocopies enough for document verification in camp?",
+      "expected_category": "Camp Requirements",
+      "retrieved_category": "Camp Requirements",
+      "confidence": 83.44,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-009",
+      "question": "Can I request relocation after leaving orientation camp?",
+      "expected_category": "Relocation",
+      "retrieved_category": "Relocation",
+      "confidence": 89.93,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-010",
+      "question": "Which documents does a married corps member need for relocation?",
+      "expected_category": "Relocation",
+      "retrieved_category": "Relocation",
+      "confidence": 80.21,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-011",
+      "question": "What does monthly clearance mean?",
+      "expected_category": "Monthly Clearance",
+      "retrieved_category": "Monthly Clearance",
+      "confidence": 81.26,
+      "correct": true,
+      "response_time": 0.02
+    },
+    {
+      "id": "eval-012",
+      "question": "What is a PPA in NYSC?",
+      "expected_category": "Place of Primary Assignment",
+      "retrieved_category": "Community Development Service",
+      "confidence": 69.91,
+      "correct": false,
+      "response_time": 0.02
+    },
+    {
+      "id": "eval-013",
+      "question": "What is CDS and why do corps members participate in it?",
+      "expected_category": "Community Development Service",
+      "retrieved_category": "Community Development Service",
+      "confidence": 67.0,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-014",
+      "question": "What happens during the NYSC passing-out stage?",
+      "expected_category": "Passing Out",
+      "retrieved_category": "Passing Out",
+      "confidence": 79.54,
+      "correct": true,
+      "response_time": 0.02
+    },
+    {
+      "id": "eval-015",
+      "question": "How do I get an NYSC exemption certificate?",
+      "expected_category": "Exemption",
+      "retrieved_category": "Exemption",
+      "confidence": 84.88,
+      "correct": true,
+      "response_time": 0.02
+    },
+    {
+      "id": "eval-016",
+      "question": "Where should a locally trained graduate collect an exemption certificate?",
+      "expected_category": "Exemption",
+      "retrieved_category": "Exemption",
+      "confidence": 92.87,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-017",
+      "question": "What academic documents do foreign-trained graduates need for NYSC?",
+      "expected_category": "Foreign-Trained Graduates",
+      "retrieved_category": "Foreign-Trained Graduates",
+      "confidence": 94.21,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-018",
+      "question": "Must a foreign-trained graduate present original documents in camp?",
+      "expected_category": "Foreign-Trained Graduates",
+      "retrieved_category": "Camp Requirements",
+      "confidence": 90.18,
+      "correct": false,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-019",
+      "question": "What should I do if the NYSC portal is not opening?",
+      "expected_category": "Portal Support",
+      "retrieved_category": "Portal Support",
+      "confidence": 72.09,
+      "correct": true,
+      "response_time": 0.03
+    },
+    {
+      "id": "eval-020",
+      "question": "How can I correct a spelling error in my name on the NYSC portal?",
+      "expected_category": "Portal Support",
+      "retrieved_category": "Portal Support",
+      "confidence": 94.11,
+      "correct": true,
+      "response_time": 0.03
+    }
+  ]
+}

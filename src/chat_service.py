@@ -25,6 +25,7 @@ class NYSCChatService:
 
     def __init__(self) -> None:
         """Load the vector store, embedding model, and Gemini client."""
+        self.last_topic: str | None = None
         logger.info("Chat service initialization started.")
 
         try:
@@ -192,7 +193,73 @@ class NYSCChatService:
             "success": True,
             "error": None,
             "response_type": "conversational",
+            "topic": None,
         }
+
+    @staticmethod
+    def extract_topic_from_sources(
+        sources: list[dict],
+    ) -> str | None:
+        """Return the first non-empty category found in source metadata."""
+        for source in sources:
+            category = source.get("category")
+
+            if isinstance(category, str) and category.strip():
+                return " ".join(category.split())
+
+        return None
+
+    @staticmethod
+    def is_follow_up_question(question: str) -> bool:
+        """Return whether a short question may refer to an earlier topic."""
+        if NYSCChatService.detect_conversational_intent(question):
+            return False
+
+        normalized_question = "".join(
+            character
+            for character in question.lower().strip()
+            if character.isalnum() or character.isspace()
+        )
+        normalized_question = " ".join(normalized_question.split())
+
+        if not normalized_question:
+            return False
+
+        word_references = {
+            "it",
+            "this",
+            "that",
+            "them",
+            "there",
+        }
+        phrase_references = {
+            "the process",
+            "the requirement",
+            "the letter",
+            "the document",
+        }
+        words = normalized_question.split()
+
+        if word_references.intersection(words):
+            return True
+
+        if any(
+            phrase in normalized_question
+            for phrase in phrase_references
+        ):
+            return True
+
+        return len(words) < 10
+
+    def resolve_follow_up_question(self, question: str) -> str:
+        """Add the previous topic to a likely follow-up retrieval query."""
+        if self.last_topic and self.is_follow_up_question(question):
+            return (
+                f"{question} The previous NYSC topic was: "
+                f"{self.last_topic}."
+            )
+
+        return question
 
     def ask(self, question: str) -> dict:
         """Answer one NYSC question and return a structured result.
@@ -232,13 +299,19 @@ class NYSCChatService:
                 conversational_intent
             )
             response["question"] = cleaned_question
+            response["topic"] = self.last_topic
             return response
 
+        # The resolved question is used internally only. The original cleaned
+        # question remains in the response shown to the user.
+        resolved_question = self.resolve_follow_up_question(
+            cleaned_question
+        )
         start_time = time.perf_counter()
 
         try:
             result = answer_question(
-                cleaned_question,
+                resolved_question,
                 self.index,
                 self.documents,
                 self.embedding_model,
@@ -254,6 +327,12 @@ class NYSCChatService:
             formatted_sources = self.format_sources(
                 result.get("sources", [])
             )
+            current_topic = self.extract_topic_from_sources(
+                formatted_sources
+            )
+
+            if current_topic:
+                self.last_topic = current_topic
 
             logger.info(
                 "Question processed | success=%s | confidence=%.2f | "
@@ -273,6 +352,7 @@ class NYSCChatService:
                 "success": True,
                 "error": None,
                 "response_type": "rag",
+                "topic": current_topic,
             }
         except Exception as error:
             response_time = time.perf_counter() - start_time
@@ -303,6 +383,7 @@ class NYSCChatService:
                 "success": False,
                 "error": safe_error,
                 "response_type": "error",
+                "topic": self.last_topic,
             }
 
 

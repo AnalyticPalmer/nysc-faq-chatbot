@@ -87,6 +87,58 @@ User question:
 """
 
 
+def extract_answer_from_retrieved_text(text: str) -> str:
+    """Extract the answer portion from a prepared FAQ text block.
+
+    Args:
+        text: Retrieved FAQ text containing labelled sections.
+
+    Returns:
+        The cleaned answer, or the original cleaned text when no answer
+        label is present.
+
+    Raises:
+        ValueError: If the supplied text is empty.
+    """
+    cleaned_text = " ".join(text.split())
+
+    if not cleaned_text:
+        raise ValueError("Retrieved FAQ text cannot be empty.")
+
+    if "Answer:" not in cleaned_text:
+        return cleaned_text
+
+    answer_text = cleaned_text.split("Answer:", maxsplit=1)[1]
+
+    if "Source:" in answer_text:
+        answer_text = answer_text.split("Source:", maxsplit=1)[0]
+
+    return answer_text.strip()
+
+
+def build_retrieval_fallback(results: list[dict]) -> str:
+    """Build a verified answer directly from the highest-ranked result."""
+    if not results:
+        raise ValueError(
+            "A retrieval fallback requires at least one result."
+        )
+
+    highest_ranked_result = min(
+        results,
+        key=lambda result: result.get("rank", float("inf")),
+    )
+    answer = extract_answer_from_retrieved_text(
+        highest_ranked_result.get("text", "")
+    )
+    fallback_note = (
+        "Note: This response was retrieved directly from the verified "
+        "NYSC knowledge base because the AI response service is "
+        "temporarily unavailable."
+    )
+
+    return f"{answer}\n\n{fallback_note}"
+
+
 def generate_answer(
     question: str,
     client: genai.Client,
@@ -150,6 +202,7 @@ def answer_question(
             "answer": UNAVAILABLE_RESPONSE,
             "sources": [],
             "confidence": 0.0,
+            "generation_mode": "unavailable",
         }
 
     highest_confidence = max(
@@ -161,15 +214,38 @@ def answer_question(
             "answer": UNAVAILABLE_RESPONSE,
             "sources": [],
             "confidence": 0.0,
+            "generation_mode": "unavailable",
         }
 
     context = build_context(results)
-    generated_answer = generate_answer(
-        question,
-        gemini_client,
-        model_name,
-        context,
-    )
+    generation_mode = "gemini"
+
+    try:
+        generated_answer = generate_answer(
+            question,
+            gemini_client,
+            model_name,
+            context,
+        )
+    except Exception as error:
+        error_message = str(error).lower()
+        temporary_error_indicators = (
+            "429",
+            "resource_exhausted",
+            "quota",
+            "rate limit",
+            "503",
+            "unavailable",
+        )
+
+        if not any(
+            indicator in error_message
+            for indicator in temporary_error_indicators
+        ):
+            raise
+
+        generated_answer = build_retrieval_fallback(results)
+        generation_mode = "retrieval_fallback"
 
     sources = []
     seen_sources = set()
@@ -195,6 +271,7 @@ def answer_question(
         "answer": generated_answer,
         "sources": sources,
         "confidence": highest_confidence,
+        "generation_mode": generation_mode,
     }
 
 

@@ -178,5 +178,50 @@
     "source_title": "NYSC Frequently Asked Questions",
     "source_url": "https://www.nysc.gov.ng/faq.html",
     "date_verified": "2026-07-27"
+  },
+  {
+    "id": "faq-021",
+    "category": "Camp Requirements",
+    "question": "What documents should a locally trained graduate take to NYSC orientation camp?",
+    "answer": "A locally trained prospective corps member should follow the instructions printed on the call-up letter and bring the original documents and identification items specifically requested by NYSC. Requirements may differ by batch, so the call-up letter and official NYSC portal should be checked before travelling.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-022",
+    "category": "Camp Requirements",
+    "question": "What documents should I take to NYSC orientation camp?",
+    "answer": "Check the instructions on your NYSC call-up letter and official dashboard because the required documents depend on whether you are locally trained or foreign trained. Bring only genuine original documents requested by NYSC and confirm current requirements before travelling.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-023",
+    "category": "Foreign-Trained Graduates",
+    "question": "What documents must a foreign-trained graduate take to NYSC camp?",
+    "answer": "A foreign-trained prospective corps member must take the original documents uploaded during online registration and translated versions of certificates that are not written in English. The documents must be verified in camp before the person leaves.",
+    "source_title": "NYSC Frequently Asked Questions",
+    "source_url": "https://www.nysc.gov.ng/faq.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-024",
+    "category": "Camp Requirements",
+    "question": "Can I use photocopies instead of original documents at NYSC camp?",
+    "answer": "Where NYSC requires original credentials, photocopies alone should not be relied upon. Prospective corps members should follow the exact document instructions on their call-up letter and official NYSC dashboard.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
+  },
+  {
+    "id": "faq-025",
+    "category": "Camp Requirements",
+    "question": "What happens if someone presents a fake document at NYSC camp?",
+    "answer": "NYSC states that anyone who presents a fake document may be demobilized and removed from camp and may be handed over to law-enforcement authorities for prosecution.",
+    "source_title": "NYSC Registration Requirements",
+    "source_url": "https://www.nysc.gov.ng/mobreg.html",
+    "date_verified": "2026-07-28"
   }
 ]

@@ -1,10 +1,20 @@
 """Professional Streamlit interface for the NYSC FAQ Chatbot."""
 
 import json
+import sys
 from html import escape
 from pathlib import Path
 
 import streamlit as st
+
+
+# Add the project root to Python's import path.
+# This allows Streamlit Cloud to locate the src package.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 
 from src.chat_service import NYSCChatService
 
@@ -16,7 +26,7 @@ st.set_page_config(
 )
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 FAQ_DATA_PATH = PROJECT_ROOT / "data" / "faq" / "nysc_faq.json"
 EVALUATION_REPORT_PATH = (
     PROJECT_ROOT / "reports" / "evaluation_report.json"

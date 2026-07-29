@@ -1,6 +1,7 @@
 """Professional Streamlit interface for the NYSC FAQ Chatbot."""
 
 import json
+import os
 import sys
 from html import escape
 from pathlib import Path
@@ -28,6 +29,9 @@ st.set_page_config(
 
 
 FAQ_DATA_PATH = PROJECT_ROOT / "data" / "faq" / "nysc_faq.json"
+PDF_DATA_DIR = PROJECT_ROOT / "data" / "raw"
+VECTOR_METADATA_PATH = PROJECT_ROOT / "vector_store" / "metadata.json"
+FAISS_INDEX_PATH = PROJECT_ROOT / "vector_store" / "nysc_faq.index"
 EVALUATION_REPORT_PATH = (
     PROJECT_ROOT / "reports" / "evaluation_report.json"
 )
@@ -308,6 +312,83 @@ def load_dashboard_data() -> tuple[int, str]:
     return total_faqs, retrieval_accuracy
 
 
+@st.cache_data
+def load_knowledge_base_statistics() -> dict:
+    """Load safe knowledge-base counts without blocking the application."""
+    statistics = {
+        "total_faqs": 0,
+        "total_pdf_files": 0,
+        "total_faq_chunks": 0,
+        "total_pdf_chunks": 0,
+        "total_vectors": 0,
+        "vector_store_ready": False,
+    }
+
+    try:
+        with FAQ_DATA_PATH.open("r", encoding="utf-8") as file:
+            faq_records = json.load(file)
+
+        if isinstance(faq_records, list):
+            statistics["total_faqs"] = len(faq_records)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    try:
+        if PDF_DATA_DIR.exists():
+            statistics["total_pdf_files"] = sum(
+                path.is_file()
+                for path in PDF_DATA_DIR.glob("*.pdf")
+            )
+    except OSError:
+        pass
+
+    try:
+        with VECTOR_METADATA_PATH.open("r", encoding="utf-8") as file:
+            vector_metadata = json.load(file)
+
+        if isinstance(vector_metadata, list):
+            statistics["total_vectors"] = len(vector_metadata)
+
+            for record in vector_metadata:
+                if not isinstance(record, dict):
+                    continue
+
+                metadata = record.get("metadata", record)
+                document_type = (
+                    metadata.get("document_type", "faq")
+                    if isinstance(metadata, dict)
+                    else "faq"
+                )
+
+                if document_type == "pdf":
+                    statistics["total_pdf_chunks"] += 1
+                else:
+                    statistics["total_faq_chunks"] += 1
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    statistics["vector_store_ready"] = (
+        FAISS_INDEX_PATH.exists() and VECTOR_METADATA_PATH.exists()
+    )
+
+    return statistics
+
+
+def is_local_development() -> bool:
+    """Return whether safe environment indicators identify a local run."""
+    try:
+        sharing_mode = os.getenv("STREAMLIT_SHARING_MODE")
+        cloud_flag = os.getenv("IS_STREAMLIT_CLOUD", "")
+
+        return (
+            sharing_mode is None
+            and cloud_flag.strip().lower() != "true"
+        )
+    except Exception:
+        # Uncertain environments must not expose the rebuild control.
+        return False
+
+
 def calculate_average_response_time(messages: list[dict]) -> str:
     """Calculate the average response time from assistant chat messages."""
     response_times = [
@@ -509,9 +590,47 @@ def format_conversation_for_download(messages: list[dict]) -> str:
                     title = source.get("title", "NYSC source")
                     category = source.get("category", "")
                     url = source.get("url", "")
-                    transcript_lines.append(
-                        f"- {title} | {category} | {url}"
+                    document_type = source.get(
+                        "document_type",
+                        "faq",
                     )
+
+                    if document_type == "pdf":
+                        source_path = source.get("source_path", "")
+                        filename = (
+                            Path(source_path).name
+                            if source_path
+                            else ""
+                        )
+                        transcript_lines.append(
+                            "- Source type: Official PDF Document"
+                        )
+                        transcript_lines.append(
+                            f"  Document title: {title}"
+                        )
+                        transcript_lines.append(
+                            "  Category: Official Document"
+                        )
+
+                        if filename:
+                            transcript_lines.append(
+                                f"  Document file: {filename}"
+                            )
+                    else:
+                        transcript_lines.append(
+                            "- Source type: Verified FAQ"
+                        )
+                        transcript_lines.append(
+                            f"  Source title: {title}"
+                        )
+                        transcript_lines.append(
+                            f"  Category: {category}"
+                        )
+
+                        if url:
+                            transcript_lines.append(
+                                f"  Official URL: {url}"
+                            )
 
         transcript_lines.append("")
 
@@ -554,17 +673,51 @@ def display_assistant_message(message: dict, message_index: int) -> None:
                     title = source.get("title", "NYSC source")
                     category = source.get("category", "")
                     url = source.get("url", "")
+                    document_type = source.get(
+                        "document_type",
+                        "faq",
+                    )
+                    source_path = source.get("source_path", "")
 
                     with st.container(border=True):
-                        st.markdown(f"**{escape(str(title))}**")
-                        st.caption(f"Category: {category}")
-
-                        if url:
-                            st.link_button(
-                                "Open official source",
-                                url,
-                                use_container_width=False,
+                        if document_type == "pdf":
+                            filename = (
+                                Path(source_path).name
+                                if source_path
+                                else ""
                             )
+                            st.caption(
+                                "Source type: Official PDF Document"
+                            )
+                            st.markdown(
+                                "**Document title:** "
+                                f"{escape(str(title))}"
+                            )
+                            st.markdown(
+                                "**Category:** Official Document"
+                            )
+
+                            if filename:
+                                st.markdown(
+                                    "**Document file:** "
+                                    f"{escape(filename)}"
+                                )
+                        else:
+                            st.caption("Source type: Verified FAQ")
+                            st.markdown(
+                                "**Source title:** "
+                                f"{escape(str(title))}"
+                            )
+                            st.markdown(
+                                f"**Category:** {escape(str(category))}"
+                            )
+
+                            if url:
+                                st.link_button(
+                                    "Open official source",
+                                    url,
+                                    use_container_width=False,
+                                )
 
         feedback = message.get("feedback")
         if feedback is None:
@@ -611,7 +764,9 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-total_faqs, retrieval_accuracy = load_dashboard_data()
+_, retrieval_accuracy = load_dashboard_data()
+knowledge_base_statistics = load_knowledge_base_statistics()
+total_faqs = knowledge_base_statistics["total_faqs"]
 average_response_time = calculate_average_response_time(
     st.session_state.messages
 )
@@ -662,9 +817,65 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     st.markdown(
-        f'<div class="sidebar-value">{total_faqs} verified FAQs</div>',
+        '<div class="sidebar-value">'
+        f"<strong>Verified FAQs:</strong> "
+        f"{knowledge_base_statistics['total_faqs']}<br>"
+        f"<strong>Official PDFs:</strong> "
+        f"{knowledge_base_statistics['total_pdf_files']}<br>"
+        f"<strong>FAQ Chunks:</strong> "
+        f"{knowledge_base_statistics['total_faq_chunks']}<br>"
+        f"<strong>PDF Chunks:</strong> "
+        f"{knowledge_base_statistics['total_pdf_chunks']}<br>"
+        f"<strong>Total Vectors:</strong> "
+        f"{knowledge_base_statistics['total_vectors']}<br>"
+        f"<strong>Vector Store Status:</strong> "
+        f"{'Ready' if knowledge_base_statistics['vector_store_ready'] else 'Not Ready'}"
+        "</div>",
         unsafe_allow_html=True,
     )
+
+    if st.session_state.pop(
+        "knowledge_base_refresh_success",
+        False,
+    ):
+        st.success("Knowledge base refreshed successfully.")
+
+    if is_local_development():
+        if st.button(
+            "Refresh Knowledge Base",
+            key="refresh_knowledge_base",
+            use_container_width=True,
+        ):
+            try:
+                from src.vector_store import build_vector_store
+
+                with st.status(
+                    "Refreshing the knowledge base...",
+                    expanded=True,
+                ) as refresh_status:
+                    build_vector_store()
+                    load_knowledge_base_statistics.clear()
+                    load_chat_service.clear()
+                    refresh_status.update(
+                        label="Knowledge base refresh complete",
+                        state="complete",
+                        expanded=False,
+                    )
+
+                st.session_state[
+                    "knowledge_base_refresh_success"
+                ] = True
+                st.rerun()
+            except Exception:
+                from src.logger import logger
+
+                logger.exception(
+                    "Local knowledge-base refresh failed."
+                )
+                st.error(
+                    "The knowledge base could not be refreshed. "
+                    "Please check the local application logs."
+                )
 
     st.markdown(
         '<div class="sidebar-label">Retriever</div>',
@@ -725,6 +936,18 @@ with st.sidebar:
         ),
     }
     st.caption(response_mode_help[selected_response_mode_label])
+
+    with st.expander("System Information"):
+        st.markdown("**Retriever:** FAISS")
+        st.markdown(
+            "**Embedding Model:** all-MiniLM-L6-v2"
+        )
+        st.markdown("**Vector Dimension:** 384")
+        st.markdown("**Supported Sources:** FAQ and PDF")
+        st.markdown(
+            f"**Active Response Mode:** "
+            f"{selected_response_mode_label}"
+        )
 
     st.markdown(
         '<div class="sidebar-label">Session Statistics</div>',

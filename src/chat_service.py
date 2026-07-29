@@ -28,6 +28,7 @@ class NYSCChatService:
     def __init__(self) -> None:
         """Load the vector store, embedding model, and Gemini client."""
         self.last_topic: str | None = None
+        self.response_cache: dict[tuple[str, str], dict] = {}
         logger.info("Chat service initialization started.")
 
         try:
@@ -206,6 +207,7 @@ class NYSCChatService:
             "response_type": "conversational",
             "topic": None,
             "generation_mode": "conversational",
+            "cache_hit": False,
         }
 
     @staticmethod
@@ -273,6 +275,21 @@ class NYSCChatService:
 
         return question
 
+    @staticmethod
+    def build_cache_key(
+        question: str,
+        response_mode: str,
+    ) -> tuple[str, str]:
+        """Build a normalized cache key without exposing internal context."""
+        normalized_question = "".join(
+            character
+            for character in question.lower().strip()
+            if character.isalnum() or character.isspace()
+        )
+        normalized_question = " ".join(normalized_question.split())
+
+        return normalized_question, response_mode
+
     def ask(
         self,
         question: str,
@@ -330,6 +347,22 @@ class NYSCChatService:
         resolved_question = self.resolve_follow_up_question(
             cleaned_question
         )
+        cache_key = self.build_cache_key(
+            resolved_question,
+            response_mode,
+        )
+
+        if cache_key in self.response_cache:
+            cached_response = self.response_cache[cache_key].copy()
+            cached_response["question"] = cleaned_question
+            cached_response["response_time"] = 0.0
+            cached_response["cache_hit"] = True
+
+            if cached_response.get("topic"):
+                self.last_topic = cached_response["topic"]
+
+            return cached_response
+
         start_time = time.perf_counter()
 
         try:
@@ -367,7 +400,7 @@ class NYSCChatService:
                 len(formatted_sources),
             )
 
-            return {
+            service_response = {
                 "question": cleaned_question,
                 "answer": result["answer"],
                 "confidence": confidence,
@@ -379,7 +412,15 @@ class NYSCChatService:
                 "topic": current_topic,
                 "generation_mode": result["generation_mode"],
                 "requested_response_mode": response_mode,
+                "cache_hit": False,
             }
+
+            if result["generation_mode"] != "unavailable":
+                self.response_cache[cache_key] = (
+                    service_response.copy()
+                )
+
+            return service_response
         except Exception as error:
             response_time = time.perf_counter() - start_time
 
@@ -412,6 +453,7 @@ class NYSCChatService:
                 "topic": self.last_topic,
                 "generation_mode": "error",
                 "requested_response_mode": response_mode,
+                "cache_hit": False,
             }
 
 

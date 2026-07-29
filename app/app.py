@@ -323,6 +323,51 @@ def calculate_average_response_time(messages: list[dict]) -> str:
     return f"{average_time:.2f} sec"
 
 
+def get_confidence_label(confidence: float) -> str:
+    """Return a clear label for a numeric confidence score."""
+    if confidence >= 85:
+        return "High"
+
+    if confidence >= 70:
+        return "Medium"
+
+    return "Low"
+
+
+def calculate_session_statistics(
+    messages: list[dict],
+) -> tuple[int, int, int, float]:
+    """Calculate question, feedback, and RAG confidence statistics."""
+    questions_asked = sum(
+        message.get("role") == "user" for message in messages
+    )
+    helpful_ratings = sum(
+        message.get("feedback") == "helpful" for message in messages
+    )
+    not_helpful_ratings = sum(
+        message.get("feedback") == "not_helpful" for message in messages
+    )
+    rag_confidences = [
+        float(message.get("confidence", 0.0))
+        for message in messages
+        if message.get("role") == "assistant"
+        and message.get("response_type", "rag") == "rag"
+        and message.get("success", True)
+    ]
+    average_confidence = (
+        sum(rag_confidences) / len(rag_confidences)
+        if rag_confidences
+        else 0.0
+    )
+
+    return (
+        questions_asked,
+        helpful_ratings,
+        not_helpful_ratings,
+        average_confidence,
+    )
+
+
 def get_follow_up_questions(message: dict) -> list[str]:
     """Return up to three follow-up questions based on source categories."""
     category_questions = {
@@ -416,6 +461,8 @@ def format_conversation_for_download(messages: list[dict]) -> str:
         response_type = message.get("response_type", "rag")
 
         if response_type == "rag":
+            confidence = float(message.get("confidence", 0.0))
+            confidence_label = get_confidence_label(confidence)
             requested_mode = message.get(
                 "requested_response_mode",
                 "auto",
@@ -428,13 +475,31 @@ def format_conversation_for_download(messages: list[dict]) -> str:
                 f"Requested response mode: {requested_mode_label}"
             )
             transcript_lines.append(
-                f"Confidence: "
-                f"{float(message.get('confidence', 0.0)):.2f}%"
+                f"Confidence: {confidence_label} ({confidence:.2f}%)"
             )
             transcript_lines.append(
                 f"Response time: "
                 f"{float(message.get('response_time', 0.0)):.2f} seconds"
             )
+            transcript_lines.append(
+                "Generation mode: "
+                f"{message.get('generation_mode', 'unavailable')}"
+            )
+            cache_status = (
+                "Loaded from session cache"
+                if message.get("cache_hit", False)
+                else "Not cached"
+            )
+            transcript_lines.append(f"Cache status: {cache_status}")
+
+            feedback = message.get("feedback")
+            if feedback:
+                feedback_label = (
+                    "Helpful"
+                    if feedback == "helpful"
+                    else "Not Helpful"
+                )
+                transcript_lines.append(f"Feedback: {feedback_label}")
 
             sources = message.get("sources", [])
             if sources:
@@ -453,19 +518,23 @@ def format_conversation_for_download(messages: list[dict]) -> str:
     return "\n".join(transcript_lines).strip() + "\n"
 
 
-def display_assistant_message(message: dict) -> None:
+def display_assistant_message(message: dict, message_index: int) -> None:
     """Display an assistant message according to its response type."""
     st.markdown(message["content"])
     response_type = message.get("response_type", "rag")
+    is_successful_rag = (
+        response_type == "rag" and message.get("success", True)
+    )
 
-    if response_type == "rag":
+    if is_successful_rag:
         confidence = float(message.get("confidence", 0.0))
+        confidence_label = get_confidence_label(confidence)
         response_time = float(message.get("response_time", 0.0))
 
         st.markdown(
             '<div class="response-details">'
             f'<span class="detail-badge">'
-            f"Confidence: {confidence:.2f}%"
+            f"Confidence: {confidence_label} ({confidence:.2f}%)"
             "</span>"
             f'<span class="detail-badge">'
             f"Response Time: {response_time:.2f} seconds"
@@ -473,6 +542,9 @@ def display_assistant_message(message: dict) -> None:
             "</div>",
             unsafe_allow_html=True,
         )
+
+        if message.get("cache_hit", False):
+            st.caption("Loaded from session cache")
 
         sources = message.get("sources", [])
 
@@ -493,6 +565,30 @@ def display_assistant_message(message: dict) -> None:
                                 url,
                                 use_container_width=False,
                             )
+
+        feedback = message.get("feedback")
+        if feedback is None:
+            feedback_columns = st.columns(2)
+
+            with feedback_columns[0]:
+                if st.button(
+                    "Helpful",
+                    key=f"feedback_helpful_{message_index}",
+                    use_container_width=True,
+                ):
+                    message["feedback"] = "helpful"
+                    st.rerun()
+
+            with feedback_columns[1]:
+                if st.button(
+                    "Not Helpful",
+                    key=f"feedback_not_helpful_{message_index}",
+                    use_container_width=True,
+                ):
+                    message["feedback"] = "not_helpful"
+                    st.rerun()
+        else:
+            st.success("Thank you for your feedback.")
 
     if response_type != "error":
         with st.expander("Copy Answer"):
@@ -519,6 +615,12 @@ total_faqs, retrieval_accuracy = load_dashboard_data()
 average_response_time = calculate_average_response_time(
     st.session_state.messages
 )
+(
+    questions_asked,
+    helpful_ratings,
+    not_helpful_ratings,
+    average_confidence,
+) = calculate_session_statistics(st.session_state.messages)
 active_model = chat_service.model_name
 
 
@@ -623,6 +725,15 @@ with st.sidebar:
         ),
     }
     st.caption(response_mode_help[selected_response_mode_label])
+
+    st.markdown(
+        '<div class="sidebar-label">Session Statistics</div>',
+        unsafe_allow_html=True,
+    )
+    st.metric("Questions Asked", questions_asked)
+    st.metric("Helpful Ratings", helpful_ratings)
+    st.metric("Not Helpful Ratings", not_helpful_ratings)
+    st.metric("Average Confidence", f"{average_confidence:.2f}%")
 
     st.markdown(
         '<div class="sidebar-label">Conversation</div>',
@@ -752,7 +863,7 @@ for message_index, message in enumerate(st.session_state.messages):
         if message["role"] == "user":
             st.write(message["content"])
         else:
-            display_assistant_message(message)
+            display_assistant_message(message, message_index)
 
     response_type = message.get("response_type", "rag")
     is_latest_successful_rag = (
@@ -817,15 +928,26 @@ if question:
         "response_time": result["response_time"],
         "sources": result["sources"],
         "response_type": result.get("response_type", "rag"),
+        "generation_mode": result.get(
+            "generation_mode",
+            "unavailable",
+        ),
         "requested_response_mode": result.get(
             "requested_response_mode",
             selected_response_mode,
         ),
+        "topic": result.get("topic"),
+        "cache_hit": result.get("cache_hit", False),
+        "feedback": None,
+        "success": result.get("success", True),
     }
     st.session_state.messages.append(assistant_message)
 
     with st.chat_message("assistant"):
-        display_assistant_message(assistant_message)
+        display_assistant_message(
+            assistant_message,
+            len(st.session_state.messages) - 1,
+        )
 
 
 st.markdown(

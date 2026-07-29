@@ -9,6 +9,7 @@ import numpy as np
 from src.data_loader import load_faq_data
 from src.data_preprocessor import prepare_faq_documents
 from src.embedding_model import generate_embeddings, load_embedding_model
+from src.pdf_preprocessor import load_and_chunk_pdf_documents
 from src.text_chunker import chunk_documents
 
 
@@ -71,42 +72,49 @@ def save_vector_store(
 
 
 def build_vector_store() -> tuple[faiss.IndexFlatIP, list[dict]]:
-    """Build, save, and return the NYSC FAQ vector store."""
+    """Build, save, and return the combined FAQ and PDF vector store."""
     faq_records = load_faq_data()
     prepared_documents = prepare_faq_documents(faq_records)
-    chunked_documents = chunk_documents(prepared_documents)
+    faq_chunks = chunk_documents(prepared_documents)
 
-    if not chunked_documents:
+    if not faq_chunks:
         raise ValueError("No FAQ document chunks are available to index.")
 
-    chunk_texts = [
-        document["text"] for document in chunked_documents
-    ]
+    pdf_chunks = load_and_chunk_pdf_documents()
+    all_documents = faq_chunks + pdf_chunks
+    chunk_texts = [document["text"] for document in all_documents]
 
     model = load_embedding_model()
     embeddings = generate_embeddings(chunk_texts, model)
 
-    if embeddings.shape[0] != len(chunked_documents):
+    if embeddings.shape[0] != len(all_documents):
         raise ValueError(
             "The number of embeddings does not match the number of "
             "document chunks."
         )
 
     index = create_faiss_index(embeddings)
-    save_vector_store(index, chunked_documents)
+    save_vector_store(index, all_documents)
 
-    return index, chunked_documents
+    return index, all_documents
 
 
 def main() -> None:
     """Build the vector store and print a short result summary."""
     try:
         index, documents = build_vector_store()
+        pdf_chunk_count = sum(
+            document.get("metadata", {}).get("document_type") == "pdf"
+            for document in documents
+        )
+        faq_chunk_count = len(documents) - pdf_chunk_count
 
+        print(f"FAQ chunks indexed: {faq_chunk_count}")
+        print(f"PDF chunks indexed: {pdf_chunk_count}")
         print(f"Total documents indexed: {len(documents)}")
         print(f"Total vectors in FAISS: {index.ntotal}")
         print(f"Embedding dimension: {index.d}")
-        print(f"FAISS index location: {FAISS_INDEX_PATH}")
+        print(f"Index location: {FAISS_INDEX_PATH}")
         print(f"Metadata location: {METADATA_PATH}")
         print("FAISS vector store created successfully.")
     except Exception as error:

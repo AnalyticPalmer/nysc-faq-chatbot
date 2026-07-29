@@ -1,9 +1,35 @@
 [theme]
-primaryColor = "#167D3A"
+primaryColor = "#168447"
+font = "sans serif"
+showSidebarBorder = true
+
+[theme.light]
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F1F8F4"
-textColor = "#1F2937"
-font = "sans serif"
+textColor = "#17211B"
+linkColor = "#116A39"
+borderColor = "#D4E6DA"
+codeBackgroundColor = "#F4F7F5"
+
+[theme.light.sidebar]
+backgroundColor = "#F5FAF7"
+secondaryBackgroundColor = "#E7F4EB"
+textColor = "#17211B"
+borderColor = "#D4E6DA"
+
+[theme.dark]
+backgroundColor = "#0E1712"
+secondaryBackgroundColor = "#17251C"
+textColor = "#F1F7F3"
+linkColor = "#69D695"
+borderColor = "#31483A"
+codeBackgroundColor = "#15201A"
+
+[theme.dark.sidebar]
+backgroundColor = "#101D16"
+secondaryBackgroundColor = "#1B2C21"
+textColor = "#F1F7F3"
+borderColor = "#31483A"
 
 [server]
 headless = true

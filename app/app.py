@@ -31,6 +31,14 @@ FAQ_DATA_PATH = PROJECT_ROOT / "data" / "faq" / "nysc_faq.json"
 EVALUATION_REPORT_PATH = (
     PROJECT_ROOT / "reports" / "evaluation_report.json"
 )
+RESPONSE_MODE_OPTIONS = {
+    "Automatic": "auto",
+    "AI Enhanced": "ai",
+    "Verified FAQ Only": "faq",
+}
+RESPONSE_MODE_LABELS = {
+    mode: label for label, mode in RESPONSE_MODE_OPTIONS.items()
+}
 
 
 # Internal styling keeps the app self-contained and preserves Streamlit
@@ -39,11 +47,27 @@ st.markdown(
     """
     <style>
     :root {
-        --nysc-green: #14532d;
-        --nysc-green-medium: #166534;
-        --nysc-green-light: #ecfdf3;
-        --nysc-border: #dce5df;
-        --nysc-text-muted: #5f6b64;
+        --nysc-green: var(--primary-color);
+        --nysc-green-soft: color-mix(
+            in srgb,
+            var(--primary-color) 14%,
+            transparent
+        );
+        --nysc-border: color-mix(
+            in srgb,
+            var(--text-color) 18%,
+            transparent
+        );
+        --nysc-text-muted: color-mix(
+            in srgb,
+            var(--text-color) 68%,
+            transparent
+        );
+        --nysc-surface: color-mix(
+            in srgb,
+            var(--secondary-background-color) 72%,
+            var(--background-color)
+        );
     }
 
     .block-container {
@@ -53,7 +77,11 @@ st.markdown(
     }
 
     h1, h2, h3 {
-        color: var(--nysc-green);
+        color: color-mix(
+            in srgb,
+            var(--nysc-green) 78%,
+            var(--text-color)
+        );
         letter-spacing: -0.02em;
     }
 
@@ -62,7 +90,11 @@ st.markdown(
         margin-bottom: 1rem;
         border: 1px solid var(--nysc-border);
         border-radius: 1rem;
-        background: linear-gradient(135deg, #f7fff9 0%, #ecfdf3 100%);
+        background: linear-gradient(
+            135deg,
+            var(--background-color) 0%,
+            var(--nysc-surface) 100%
+        );
     }
 
     .app-header h1 {
@@ -73,7 +105,7 @@ st.markdown(
     .app-header p {
         margin: 0;
         max-width: 850px;
-        color: #3f5146;
+        color: var(--text-color);
         font-size: 1.02rem;
         line-height: 1.65;
     }
@@ -83,8 +115,12 @@ st.markdown(
         padding: 1rem 1.1rem;
         border: 1px solid var(--nysc-border);
         border-radius: 0.9rem;
-        background: #ffffff;
-        box-shadow: 0 3px 12px rgba(20, 83, 45, 0.05);
+        background: var(--nysc-surface);
+        box-shadow: 0 3px 12px color-mix(
+            in srgb,
+            var(--primary-color) 8%,
+            transparent
+        );
     }
 
     div[data-testid="stMetricLabel"] {
@@ -93,24 +129,28 @@ st.markdown(
     }
 
     div[data-testid="stMetricValue"] {
-        color: var(--nysc-green);
+        color: color-mix(
+            in srgb,
+            var(--nysc-green) 75%,
+            var(--text-color)
+        );
         font-size: 1.45rem;
     }
 
     div.stButton > button {
         min-height: 2.7rem;
-        border: 1px solid #b8c9bd;
+        border: 1px solid var(--nysc-border);
         border-radius: 0.7rem;
-        color: var(--nysc-green);
-        background: #ffffff;
+        color: var(--text-color);
+        background: var(--background-color);
         font-weight: 600;
         transition: all 0.15s ease-in-out;
     }
 
     div.stButton > button:hover {
-        border-color: var(--nysc-green-medium);
-        color: #ffffff;
-        background: var(--nysc-green-medium);
+        border-color: var(--primary-color);
+        color: var(--text-color);
+        background: var(--nysc-green-soft);
     }
 
     div[data-testid="stAlert"] {
@@ -120,9 +160,10 @@ st.markdown(
     div[data-testid="stChatMessage"] {
         margin-bottom: 0.9rem;
         padding: 1rem 1.1rem;
-        border: 1px solid #e4e9e5;
+        border: 1px solid var(--nysc-border);
         border-radius: 0.9rem;
-        background: #ffffff;
+        color: var(--text-color);
+        background: var(--nysc-surface);
     }
 
     .response-details {
@@ -135,10 +176,10 @@ st.markdown(
     .detail-badge {
         display: inline-block;
         padding: 0.35rem 0.7rem;
-        border: 1px solid #c9ddd0;
+        border: 1px solid var(--nysc-border);
         border-radius: 999px;
-        color: var(--nysc-green);
-        background: var(--nysc-green-light);
+        color: var(--text-color);
+        background: var(--nysc-green-soft);
         font-size: 0.82rem;
         font-weight: 600;
     }
@@ -148,6 +189,29 @@ st.markdown(
         color: var(--nysc-green);
         font-size: 1rem;
         font-weight: 700;
+    }
+
+    .welcome-container {
+        margin: 1rem 0 1.25rem;
+        padding: 1.25rem 1.4rem;
+        border: 1px solid var(--nysc-border);
+        border-radius: 0.9rem;
+        background: var(--nysc-surface);
+    }
+
+    .welcome-container h3 {
+        margin: 0 0 0.45rem;
+    }
+
+    .welcome-container p {
+        margin: 0 0 0.65rem;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+
+    .welcome-container ul {
+        margin-bottom: 0;
+        color: var(--text-color);
     }
 
     .sidebar-label {
@@ -161,8 +225,17 @@ st.markdown(
 
     .sidebar-value {
         margin-bottom: 0.4rem;
-        color: #425047;
+        color: var(--text-color);
         line-height: 1.5;
+    }
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        border-color: var(--nysc-border);
+        background: color-mix(
+            in srgb,
+            var(--secondary-background-color) 45%,
+            transparent
+        );
     }
 
     .app-footer {
@@ -250,42 +323,180 @@ def calculate_average_response_time(messages: list[dict]) -> str:
     return f"{average_time:.2f} sec"
 
 
+def get_follow_up_questions(message: dict) -> list[str]:
+    """Return up to three follow-up questions based on source categories."""
+    category_questions = {
+        "Registration": [
+            "How do I correct a mistake in my NYSC registration?",
+            "How can I print my NYSC green card?",
+            "Why is my registration incomplete?",
+        ],
+        "Orientation Camp": [
+            "What should I wear to orientation camp?",
+            "What happens if I miss orientation camp?",
+            "Can I leave camp before it ends?",
+        ],
+        "Camp Requirements": [
+            "What should I wear to orientation camp?",
+            "What happens if I miss orientation camp?",
+            "Can I leave camp before it ends?",
+        ],
+        "Relocation": [
+            "What grounds are accepted for NYSC relocation?",
+            "How do I check my relocation status?",
+            "Can I apply for relocation after camp?",
+        ],
+        "Place of Primary Assignment": [
+            "Can I reject my PPA?",
+            "Can my PPA be changed?",
+            "What happens after receiving my PPA letter?",
+        ],
+        "Community Development Service": [
+            "Is CDS compulsory?",
+            "How often does CDS take place?",
+            "What happens if I miss CDS?",
+        ],
+        "Monthly Clearance": [
+            "What happens if I miss monthly clearance?",
+            "How do I complete monthly clearance?",
+            "Why is monthly clearance important?",
+        ],
+        "Foreign-Trained Graduates": [
+            "Which documents must foreign-trained graduates provide?",
+            "Must original documents be presented in camp?",
+            "How are foreign certificates verified?",
+        ],
+        "Portal Support": [
+            "How do I reset my NYSC portal password?",
+            "What should I do when the portal is unavailable?",
+            "Can I reprint my call-up letter?",
+        ],
+    }
+    default_questions = [
+        "How do I register for NYSC?",
+        "What should I take to orientation camp?",
+        "How can I apply for relocation?",
+    ]
+
+    follow_up_questions = []
+
+    for source in message.get("sources", []):
+        category = source.get("category", "")
+
+        for question in category_questions.get(category, []):
+            if question not in follow_up_questions:
+                follow_up_questions.append(question)
+
+            if len(follow_up_questions) == 3:
+                return follow_up_questions
+
+    return follow_up_questions or default_questions
+
+
+def format_conversation_for_download(messages: list[dict]) -> str:
+    """Format visible conversation content as a plain-text transcript."""
+    transcript_lines = [
+        "NYSC FAQ Assistant Conversation",
+        "Generated from the NYSC FAQ Chatbot",
+        "",
+    ]
+
+    for message in messages:
+        role = message.get("role")
+        content = message.get("content", "")
+
+        if role == "user":
+            transcript_lines.extend(["User:", content, ""])
+            continue
+
+        if role != "assistant":
+            continue
+
+        transcript_lines.extend(["Assistant:", content])
+        response_type = message.get("response_type", "rag")
+
+        if response_type == "rag":
+            requested_mode = message.get(
+                "requested_response_mode",
+                "auto",
+            )
+            requested_mode_label = RESPONSE_MODE_LABELS.get(
+                requested_mode,
+                requested_mode,
+            )
+            transcript_lines.append(
+                f"Requested response mode: {requested_mode_label}"
+            )
+            transcript_lines.append(
+                f"Confidence: "
+                f"{float(message.get('confidence', 0.0)):.2f}%"
+            )
+            transcript_lines.append(
+                f"Response time: "
+                f"{float(message.get('response_time', 0.0)):.2f} seconds"
+            )
+
+            sources = message.get("sources", [])
+            if sources:
+                transcript_lines.append("Sources:")
+
+                for source in sources:
+                    title = source.get("title", "NYSC source")
+                    category = source.get("category", "")
+                    url = source.get("url", "")
+                    transcript_lines.append(
+                        f"- {title} | {category} | {url}"
+                    )
+
+        transcript_lines.append("")
+
+    return "\n".join(transcript_lines).strip() + "\n"
+
+
 def display_assistant_message(message: dict) -> None:
-    """Display an assistant answer, performance badges, and sources."""
+    """Display an assistant message according to its response type."""
     st.markdown(message["content"])
+    response_type = message.get("response_type", "rag")
 
-    confidence = float(message.get("confidence", 0.0))
-    response_time = float(message.get("response_time", 0.0))
+    if response_type == "rag":
+        confidence = float(message.get("confidence", 0.0))
+        response_time = float(message.get("response_time", 0.0))
 
-    st.markdown(
-        '<div class="response-details">'
-        f'<span class="detail-badge">Confidence: {confidence:.2f}%</span>'
-        f'<span class="detail-badge">'
-        f"Response Time: {response_time:.2f} seconds"
-        "</span>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
+        st.markdown(
+            '<div class="response-details">'
+            f'<span class="detail-badge">'
+            f"Confidence: {confidence:.2f}%"
+            "</span>"
+            f'<span class="detail-badge">'
+            f"Response Time: {response_time:.2f} seconds"
+            "</span>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
-    sources = message.get("sources", [])
+        sources = message.get("sources", [])
 
-    if sources:
-        with st.expander("View sources"):
-            for source in sources:
-                title = source.get("title", "NYSC source")
-                category = source.get("category", "")
-                url = source.get("url", "")
+        if sources:
+            with st.expander("View sources"):
+                for source in sources:
+                    title = source.get("title", "NYSC source")
+                    category = source.get("category", "")
+                    url = source.get("url", "")
 
-                with st.container(border=True):
-                    st.markdown(f"**{escape(str(title))}**")
-                    st.caption(f"Category: {category}")
+                    with st.container(border=True):
+                        st.markdown(f"**{escape(str(title))}**")
+                        st.caption(f"Category: {category}")
 
-                    if url:
-                        st.link_button(
-                            "Open official source",
-                            url,
-                            use_container_width=False,
-                        )
+                        if url:
+                            st.link_button(
+                                "Open official source",
+                                url,
+                                use_container_width=False,
+                            )
+
+    if response_type != "error":
+        with st.expander("Copy Answer"):
+            st.code(message["content"], language=None)
 
 
 try:
@@ -383,6 +594,37 @@ with st.sidebar:
     )
 
     st.markdown(
+        '<div class="sidebar-label">Response Mode</div>',
+        unsafe_allow_html=True,
+    )
+    selected_response_mode_label = st.radio(
+        "Response Mode",
+        options=list(RESPONSE_MODE_OPTIONS),
+        index=0,
+        key="response_mode_selection",
+        label_visibility="collapsed",
+    )
+    selected_response_mode = RESPONSE_MODE_OPTIONS[
+        selected_response_mode_label
+    ]
+
+    response_mode_help = {
+        "Automatic": (
+            "Uses Gemini when available and automatically falls back to "
+            "the verified FAQ knowledge base."
+        ),
+        "AI Enhanced": (
+            "Uses Gemini to create a natural answer from retrieved NYSC "
+            "information."
+        ),
+        "Verified FAQ Only": (
+            "Returns information directly from the verified FAQ "
+            "knowledge base without calling Gemini."
+        ),
+    }
+    st.caption(response_mode_help[selected_response_mode_label])
+
+    st.markdown(
         '<div class="sidebar-label">Conversation</div>',
         unsafe_allow_html=True,
     )
@@ -390,6 +632,17 @@ with st.sidebar:
     if st.button("Clear Conversation", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
+
+    if st.session_state.messages:
+        st.download_button(
+            "Download Conversation",
+            data=format_conversation_for_download(
+                st.session_state.messages
+            ),
+            file_name="nysc_chat_conversation.txt",
+            mime="text/plain",
+            use_container_width=True,
+        )
 
 
 st.markdown(
@@ -466,17 +719,66 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+if not st.session_state.messages:
+    st.markdown(
+        """
+        <div class="welcome-container">
+            <h3>Welcome to the NYSC FAQ Assistant</h3>
+            <p>
+                Ask clear questions about NYSC registration, mobilization,
+                orientation camp, relocation, PPA, CDS, monthly clearance,
+                exemption, passing out and portal support.
+            </p>
+            <ul>
+                <li>Type a question in the chat box.</li>
+                <li>Select one of the quick questions.</li>
+                <li>Ask follow-up questions where necessary.</li>
+                <li>
+                    Confirm time-sensitive information through official
+                    NYSC channels.
+                </li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 # Display all messages already stored in the current conversation.
-for message in st.session_state.messages:
+selected_follow_up = None
+last_message_index = len(st.session_state.messages) - 1
+
+for message_index, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if message["role"] == "user":
             st.write(message["content"])
         else:
             display_assistant_message(message)
 
+    response_type = message.get("response_type", "rag")
+    is_latest_successful_rag = (
+        message_index == last_message_index
+        and message.get("role") == "assistant"
+        and response_type == "rag"
+    )
+
+    if is_latest_successful_rag:
+        follow_up_questions = get_follow_up_questions(message)
+        follow_up_columns = st.columns(len(follow_up_questions))
+
+        for follow_up_index, follow_up_question in enumerate(
+            follow_up_questions
+        ):
+            with follow_up_columns[follow_up_index]:
+                if st.button(
+                    follow_up_question,
+                    key=f"follow_up_{follow_up_index}",
+                    use_container_width=True,
+                ):
+                    selected_follow_up = follow_up_question
+
 
 prompt = st.chat_input("Ask an NYSC-related question...")
-question = prompt or selected_question
+question = prompt or selected_question or selected_follow_up
 
 
 if question:
@@ -489,8 +791,23 @@ if question:
     with st.chat_message("user"):
         st.write(question)
 
-    with st.spinner("Searching verified NYSC information..."):
-        result = chat_service.ask(question)
+    with st.status(
+        "Understanding your question",
+        expanded=True,
+    ) as processing_status:
+        st.write("1. Understanding your question")
+        st.write("2. Searching the verified NYSC knowledge base")
+        st.write("3. Retrieving the most relevant information")
+        result = chat_service.ask(
+            question,
+            response_mode=selected_response_mode,
+        )
+        st.write("4. Preparing your response")
+        processing_status.update(
+            label="Response ready",
+            state="complete",
+            expanded=False,
+        )
 
     # Preserve the existing assistant-message and session-state structure.
     assistant_message = {
@@ -499,6 +816,11 @@ if question:
         "confidence": result["confidence"],
         "response_time": result["response_time"],
         "sources": result["sources"],
+        "response_type": result.get("response_type", "rag"),
+        "requested_response_mode": result.get(
+            "requested_response_mode",
+            selected_response_mode,
+        ),
     }
     st.session_state.messages.append(assistant_message)
 

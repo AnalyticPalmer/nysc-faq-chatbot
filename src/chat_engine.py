@@ -11,6 +11,14 @@ from src.retriever import load_vector_store, search_faq
 
 DEFAULT_MODEL_NAME = "gemini-3.6-flash"
 MINIMUM_CONFIDENCE = 65.0
+RESPONSE_MODE_AUTO = "auto"
+RESPONSE_MODE_AI = "ai"
+RESPONSE_MODE_FAQ = "faq"
+VALID_RESPONSE_MODES = {
+    RESPONSE_MODE_AUTO,
+    RESPONSE_MODE_AI,
+    RESPONSE_MODE_FAQ,
+}
 UNAVAILABLE_RESPONSE = (
     "I could not find verified information about this question in the "
     "current NYSC knowledge base."
@@ -116,11 +124,11 @@ def extract_answer_from_retrieved_text(text: str) -> str:
     return answer_text.strip()
 
 
-def build_retrieval_fallback(results: list[dict]) -> str:
-    """Build a verified answer directly from the highest-ranked result."""
+def build_verified_faq_answer(results: list[dict]) -> str:
+    """Build an answer directly from the highest-ranked verified FAQ."""
     if not results:
         raise ValueError(
-            "A retrieval fallback requires at least one result."
+            "A verified FAQ answer requires at least one result."
         )
 
     highest_ranked_result = min(
@@ -130,13 +138,54 @@ def build_retrieval_fallback(results: list[dict]) -> str:
     answer = extract_answer_from_retrieved_text(
         highest_ranked_result.get("text", "")
     )
-    fallback_note = (
-        "Note: This response was retrieved directly from the verified "
-        "NYSC knowledge base because the AI response service is "
-        "temporarily unavailable."
+    source_note = (
+        "Source note: This answer was retrieved directly from the "
+        "verified NYSC FAQ knowledge base."
     )
 
-    return f"{answer}\n\n{fallback_note}"
+    return f"{answer}\n\n{source_note}"
+
+
+def build_retrieval_fallback(results: list[dict]) -> str:
+    """Build a verified FAQ answer when AI generation is unavailable."""
+    verified_answer = build_verified_faq_answer(results)
+    unavailable_note = (
+        "The AI-enhanced response service is temporarily unavailable."
+    )
+
+    return f"{verified_answer}\n\n{unavailable_note}"
+
+
+def is_external_generation_error(error: Exception) -> bool:
+    """Return whether an exception indicates an external Gemini failure."""
+    error_details = (
+        f"{type(error).__name__} {error}"
+    ).lower()
+    external_error_indicators = (
+        "400",
+        "401",
+        "403",
+        "408",
+        "429",
+        "500",
+        "502",
+        "503",
+        "504",
+        "permission_denied",
+        "resource_exhausted",
+        "quota",
+        "rate limit",
+        "unavailable",
+        "timeout",
+        "api key",
+        "authentication",
+        "connection",
+    )
+
+    return any(
+        indicator in error_details
+        for indicator in external_error_indicators
+    )
 
 
 def generate_answer(
@@ -185,10 +234,16 @@ def answer_question(
     index: object,
     documents: list[dict],
     embedding_model: object,
-    gemini_client: genai.Client,
+    gemini_client: genai.Client | None,
     model_name: str,
+    response_mode: str = RESPONSE_MODE_AUTO,
 ) -> dict:
     """Retrieve relevant FAQs and generate a grounded Gemini answer."""
+    if response_mode not in VALID_RESPONSE_MODES:
+        raise ValueError(
+            f"Unsupported response mode: {response_mode}"
+        )
+
     results = search_faq(
         question,
         index,
@@ -217,35 +272,29 @@ def answer_question(
             "generation_mode": "unavailable",
         }
 
-    context = build_context(results)
-    generation_mode = "gemini"
-
-    try:
-        generated_answer = generate_answer(
-            question,
-            gemini_client,
-            model_name,
-            context,
-        )
-    except Exception as error:
-        error_message = str(error).lower()
-        temporary_error_indicators = (
-            "429",
-            "resource_exhausted",
-            "quota",
-            "rate limit",
-            "503",
-            "unavailable",
-        )
-
-        if not any(
-            indicator in error_message
-            for indicator in temporary_error_indicators
-        ):
-            raise
-
+    if response_mode == RESPONSE_MODE_FAQ:
+        generated_answer = build_verified_faq_answer(results)
+        generation_mode = "verified_faq"
+    elif gemini_client is None:
         generated_answer = build_retrieval_fallback(results)
         generation_mode = "retrieval_fallback"
+    else:
+        context = build_context(results)
+
+        try:
+            generated_answer = generate_answer(
+                question,
+                gemini_client,
+                model_name,
+                context,
+            )
+            generation_mode = "gemini"
+        except Exception as error:
+            if not is_external_generation_error(error):
+                raise
+
+            generated_answer = build_retrieval_fallback(results)
+            generation_mode = "retrieval_fallback"
 
     sources = []
     seen_sources = set()

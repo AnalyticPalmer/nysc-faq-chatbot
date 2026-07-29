@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 
 from src.chat_engine import (
     DEFAULT_MODEL_NAME,
+    RESPONSE_MODE_AUTO,
+    VALID_RESPONSE_MODES,
     answer_question,
     load_gemini_client,
 )
@@ -53,7 +55,16 @@ class NYSCChatService:
 
             self.index, self.documents = load_vector_store()
             self.embedding_model = load_embedding_model()
-            self.gemini_client = load_gemini_client()
+            self.gemini_client = None
+
+            try:
+                self.gemini_client = load_gemini_client()
+            except Exception:
+                logger.warning(
+                    "Gemini client is unavailable. Verified FAQ "
+                    "fallback responses will be used."
+                )
+
             self.model_name = os.getenv(
                 "GEMINI_MODEL",
                 DEFAULT_MODEL_NAME,
@@ -194,6 +205,7 @@ class NYSCChatService:
             "error": None,
             "response_type": "conversational",
             "topic": None,
+            "generation_mode": "conversational",
         }
 
     @staticmethod
@@ -261,11 +273,16 @@ class NYSCChatService:
 
         return question
 
-    def ask(self, question: str) -> dict:
+    def ask(
+        self,
+        question: str,
+        response_mode: str = RESPONSE_MODE_AUTO,
+    ) -> dict:
         """Answer one NYSC question and return a structured result.
 
         Args:
             question: The user's NYSC-related question.
+            response_mode: Requested answer-generation mode.
 
         Returns:
             A dictionary containing the answer, confidence, sources,
@@ -282,6 +299,11 @@ class NYSCChatService:
 
         if not cleaned_question:
             raise ValueError("question cannot be empty.")
+
+        if response_mode not in VALID_RESPONSE_MODES:
+            raise ValueError(
+                f"Unsupported response mode: {response_mode}"
+            )
 
         # Record only safe request details, never the question itself.
         logger.info(
@@ -300,6 +322,7 @@ class NYSCChatService:
             )
             response["question"] = cleaned_question
             response["topic"] = self.last_topic
+            response["requested_response_mode"] = response_mode
             return response
 
         # The resolved question is used internally only. The original cleaned
@@ -317,6 +340,7 @@ class NYSCChatService:
                 self.embedding_model,
                 self.gemini_client,
                 self.model_name,
+                response_mode=response_mode,
             )
 
             response_time = time.perf_counter() - start_time
@@ -353,6 +377,8 @@ class NYSCChatService:
                 "error": None,
                 "response_type": "rag",
                 "topic": current_topic,
+                "generation_mode": result["generation_mode"],
+                "requested_response_mode": response_mode,
             }
         except Exception as error:
             response_time = time.perf_counter() - start_time
@@ -384,6 +410,8 @@ class NYSCChatService:
                 "error": safe_error,
                 "response_type": "error",
                 "topic": self.last_topic,
+                "generation_mode": "error",
+                "requested_response_mode": response_mode,
             }
 
 

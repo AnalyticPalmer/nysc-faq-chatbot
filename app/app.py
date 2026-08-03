@@ -449,6 +449,14 @@ def calculate_session_statistics(
     )
 
 
+def _valid_source_records(value: object) -> list[dict]:
+    """Return only mapping-like source records safe for UI rendering."""
+    if not isinstance(value, list):
+        return []
+
+    return [source for source in value if isinstance(source, dict)]
+
+
 def get_follow_up_questions(message: dict) -> list[str]:
     """Return up to three follow-up questions based on source categories."""
     category_questions = {
@@ -506,7 +514,7 @@ def get_follow_up_questions(message: dict) -> list[str]:
 
     follow_up_questions = []
 
-    for source in message.get("sources", []):
+    for source in _valid_source_records(message.get("sources")):
         category = source.get("category", "")
 
         for question in category_questions.get(category, []):
@@ -582,7 +590,7 @@ def format_conversation_for_download(messages: list[dict]) -> str:
                 )
                 transcript_lines.append(f"Feedback: {feedback_label}")
 
-            sources = message.get("sources", [])
+            sources = _valid_source_records(message.get("sources"))
             if sources:
                 transcript_lines.append("Sources:")
 
@@ -602,6 +610,13 @@ def format_conversation_for_download(messages: list[dict]) -> str:
                             if source_path
                             else ""
                         )
+                        page_number = source.get("page_number")
+                        section_title = (
+                            source.get("section_title")
+                            or source.get("section")
+                            or ""
+                        )
+
                         transcript_lines.append(
                             "- Source type: Official PDF Document"
                         )
@@ -615,6 +630,16 @@ def format_conversation_for_download(messages: list[dict]) -> str:
                         if filename:
                             transcript_lines.append(
                                 f"  Document file: {filename}"
+                            )
+
+                        if page_number not in (None, ""):
+                            transcript_lines.append(
+                                f"  Page: {page_number}"
+                            )
+
+                        if section_title:
+                            transcript_lines.append(
+                                f"  Section: {section_title}"
                             )
                     else:
                         transcript_lines.append(
@@ -637,7 +662,167 @@ def format_conversation_for_download(messages: list[dict]) -> str:
     return "\n".join(transcript_lines).strip() + "\n"
 
 
-def display_assistant_message(message: dict, message_index: int) -> None:
+def display_developer_information(message: dict) -> None:
+    """Display safe diagnostic metadata for a successful RAG response."""
+    sources = _valid_source_records(message.get("sources"))
+    requested_mode = (
+        message.get("requested_response_mode") or "auto"
+    )
+    response_mode = RESPONSE_MODE_LABELS.get(
+        requested_mode,
+        requested_mode,
+    )
+    generation_mode = (
+        message.get("generation_mode") or "unavailable"
+    )
+    generation_mode_labels = {
+        "gemini": "Gemini Enhanced",
+        "retrieval_fallback": "Retrieval Fallback",
+        "verified_faq": "Verified FAQ",
+        "unavailable": "Information Unavailable",
+    }
+    generation_mode_label = generation_mode_labels.get(
+        generation_mode,
+        str(generation_mode).replace("_", " ").title(),
+    )
+    source_type_counts = {
+        "faq": 0,
+        "pdf": 0,
+    }
+
+    for source in sources:
+        document_type = source.get("document_type", "faq")
+
+        if document_type == "pdf":
+            source_type_counts["pdf"] += 1
+        else:
+            source_type_counts["faq"] += 1
+
+    document_types = []
+    if source_type_counts["faq"]:
+        document_types.append("Verified FAQ")
+    if source_type_counts["pdf"]:
+        document_types.append("Official PDF Document")
+
+    with st.expander("Developer Information"):
+        st.markdown(
+            f"**Requested Response Mode:** {response_mode}"
+        )
+        st.markdown(
+            "**Generation Mode:** "
+            f"{generation_mode_label}"
+        )
+        st.markdown(
+            "**Cache Hit:** "
+            f"{'Yes' if message.get('cache_hit', False) else 'No'}"
+        )
+        st.markdown(
+            "**Confidence:** "
+            f"{float(message.get('confidence', 0.0)):.2f}%"
+        )
+        st.markdown(
+            "**Response Time:** "
+            f"{float(message.get('response_time', 0.0)):.2f} seconds"
+        )
+        st.markdown(
+            f"**Detected Topic:** {message.get('topic') or 'None'}"
+        )
+        st.markdown(
+            "**Document Types Used:** "
+            f"{', '.join(document_types) if document_types else 'None'}"
+        )
+        st.markdown(f"**Source Count:** {len(sources)}")
+
+        st.markdown("**Sources used:**")
+        if source_type_counts["faq"]:
+            st.markdown(
+                f"- {source_type_counts['faq']} Verified "
+                f"FAQ{'s' if source_type_counts['faq'] != 1 else ''}"
+            )
+        if source_type_counts["pdf"]:
+            st.markdown(
+                f"- {source_type_counts['pdf']} Official PDF "
+                f"Document"
+                f"{'s' if source_type_counts['pdf'] != 1 else ''}"
+            )
+        if not sources:
+            st.markdown("- None")
+
+        for source_index, source in enumerate(sources, start=1):
+            st.divider()
+            source_rank = source.get("rank") or source_index
+            document_type = source.get("document_type", "faq")
+            source_type = (
+                "Official PDF Document"
+                if document_type == "pdf"
+                else "Verified FAQ"
+            )
+            title = source.get("title", "")
+            category = source.get("category", "")
+            url = source.get("url", "")
+            source_path = source.get("source_path", "")
+            filename = (
+                Path(source_path).name
+                if document_type == "pdf" and source_path
+                else ""
+            )
+            page_number = source.get("page_number")
+            section_title = (
+                source.get("section_title")
+                or source.get("section")
+                or ""
+            )
+            similarity_score = None
+
+            for score_field in ("score", "similarity", "confidence"):
+                if source.get(score_field) is not None:
+                    similarity_score = source[score_field]
+                    break
+
+            st.markdown(f"**Rank:** {source_rank}")
+            st.markdown(f"**Source Type:** {source_type}")
+
+            if title:
+                st.markdown(f"**Title:** {escape(str(title))}")
+            if category:
+                st.markdown(
+                    f"**Category:** {escape(str(category))}"
+                )
+            if url:
+                st.markdown(
+                    f"**Official URL:** {escape(str(url))}"
+                )
+            if filename:
+                st.markdown(
+                    f"**PDF filename:** {escape(filename)}"
+                )
+            if page_number not in (None, ""):
+                st.markdown(
+                    f"**Page number:** {escape(str(page_number))}"
+                )
+            if section_title:
+                st.markdown(
+                    f"**Section:** {escape(str(section_title))}"
+                )
+
+            if similarity_score is not None:
+                if isinstance(similarity_score, (int, float)):
+                    score_display = f"{similarity_score:.4f}"
+                else:
+                    score_display = escape(str(similarity_score))
+
+                st.markdown(
+                    f"**Similarity Score:** {score_display}"
+                )
+            else:
+                st.markdown("**Similarity Score:** Not available")
+
+
+def display_assistant_message(
+    message: dict,
+    message_index: int,
+    developer_mode: bool,
+) -> None:
     """Display an assistant message according to its response type."""
     st.markdown(message["content"])
     response_type = message.get("response_type", "rag")
@@ -665,7 +850,7 @@ def display_assistant_message(message: dict, message_index: int) -> None:
         if message.get("cache_hit", False):
             st.caption("Loaded from session cache")
 
-        sources = message.get("sources", [])
+        sources = _valid_source_records(message.get("sources"))
 
         if sources:
             with st.expander("View sources"):
@@ -678,6 +863,12 @@ def display_assistant_message(message: dict, message_index: int) -> None:
                         "faq",
                     )
                     source_path = source.get("source_path", "")
+                    page_number = source.get("page_number")
+                    section_title = (
+                        source.get("section_title")
+                        or source.get("section")
+                        or ""
+                    )
 
                     with st.container(border=True):
                         if document_type == "pdf":
@@ -702,6 +893,18 @@ def display_assistant_message(message: dict, message_index: int) -> None:
                                     "**Document file:** "
                                     f"{escape(filename)}"
                                 )
+
+                            if page_number not in (None, ""):
+                                st.markdown(
+                                    "**Page:** "
+                                    f"{escape(str(page_number))}"
+                                )
+
+                            if section_title:
+                                st.markdown(
+                                    "**Section:** "
+                                    f"{escape(str(section_title))}"
+                                )
                         else:
                             st.caption("Source type: Verified FAQ")
                             st.markdown(
@@ -718,6 +921,16 @@ def display_assistant_message(message: dict, message_index: int) -> None:
                                     url,
                                     use_container_width=False,
                                 )
+
+        is_unavailable_response = (
+            message.get("generation_mode") == "unavailable"
+            or (
+                not message.get("sources")
+                and float(message.get("confidence", 0.0)) <= 0.0
+            )
+        )
+        if developer_mode and not is_unavailable_response:
+            display_developer_information(message)
 
         feedback = message.get("feedback")
         if feedback is None:
@@ -785,8 +998,8 @@ with st.sidebar:
     st.markdown('<div class="sidebar-label">About</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="sidebar-value">'
-        "A source-grounded AI assistant for common NYSC questions, "
-        "powered by semantic retrieval and verified FAQ information."
+        "A source-grounded AI assistant for NYSC questions, powered by "
+        "semantic retrieval, verified FAQs and official NYSC PDF documents."
         "</div>",
         unsafe_allow_html=True,
     )
@@ -809,6 +1022,7 @@ with st.sidebar:
         - Exemption
         - Foreign-Trained Graduates
         - Portal Support
+        - NYSC Bye-Laws and Official Documents
         """
     )
 
@@ -949,6 +1163,16 @@ with st.sidebar:
             f"{selected_response_mode_label}"
         )
 
+    developer_mode = st.checkbox(
+        "Developer Mode",
+        value=False,
+        key="developer_mode_enabled",
+        help=(
+            "Displays technical retrieval and response details for "
+            "demonstrations."
+        ),
+    )
+
     st.markdown(
         '<div class="sidebar-label">Session Statistics</div>',
         unsafe_allow_html=True,
@@ -1029,15 +1253,19 @@ quick_questions = {
     "PPA": "What is a PPA in NYSC?",
     "CDS": "What is CDS?",
     "Monthly Clearance": "What is monthly clearance?",
+    "Bye-Laws": (
+        "What happens when a corps member travels outside the state "
+        "without permission?"
+    ),
 }
 
 selected_question = None
-quick_question_columns = st.columns(3)
+quick_question_columns = st.columns(4)
 
 for index, (button_label, predefined_question) in enumerate(
     quick_questions.items()
 ):
-    column = quick_question_columns[index % 3]
+    column = quick_question_columns[index % 4]
 
     with column:
         if st.button(
@@ -1061,7 +1289,8 @@ if not st.session_state.messages:
             <p>
                 Ask clear questions about NYSC registration, mobilization,
                 orientation camp, relocation, PPA, CDS, monthly clearance,
-                exemption, passing out and portal support.
+                exemption, passing out, portal support and the NYSC
+                Bye-Laws.
             </p>
             <ul>
                 <li>Type a question in the chat box.</li>
@@ -1086,7 +1315,11 @@ for message_index, message in enumerate(st.session_state.messages):
         if message["role"] == "user":
             st.write(message["content"])
         else:
-            display_assistant_message(message, message_index)
+            display_assistant_message(
+                message,
+                message_index,
+                developer_mode,
+            )
 
     response_type = message.get("response_type", "rag")
     is_latest_successful_rag = (
@@ -1170,6 +1403,7 @@ if question:
         display_assistant_message(
             assistant_message,
             len(st.session_state.messages) - 1,
+            developer_mode,
         )
 
 

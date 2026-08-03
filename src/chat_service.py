@@ -15,11 +15,6 @@ from src.chat_engine import (
 from src.embedding_model import load_embedding_model
 from src.logger import logger
 from src.retriever import load_vector_store
-from src.vector_store import (
-    FAISS_INDEX_PATH,
-    METADATA_PATH,
-    build_vector_store,
-)
 
 
 class NYSCChatService:
@@ -33,26 +28,6 @@ class NYSCChatService:
 
         try:
             load_dotenv()
-
-            if (
-                not FAISS_INDEX_PATH.exists()
-                or not METADATA_PATH.exists()
-            ):
-                logger.info(
-                    "Vector store is missing and will be created."
-                )
-
-                try:
-                    build_vector_store()
-                except Exception as error:
-                    logger.exception(
-                        "Automatic vector store creation failed."
-                    )
-                    raise RuntimeError(
-                        "The vector store could not be initialized."
-                    ) from error
-
-                logger.info("Vector store created successfully.")
 
             self.index, self.documents = load_vector_store()
             self.embedding_model = load_embedding_model()
@@ -79,23 +54,50 @@ class NYSCChatService:
 
     @staticmethod
     def format_sources(sources: list[dict]) -> list[dict]:
-        """Remove duplicate source URLs and return consistent source data."""
+        """Return consistent source metadata without duplicate sources."""
         formatted_sources = []
-        seen_urls = set()
+        seen_sources = set()
+
+        if not isinstance(sources, list):
+            logger.warning("Ignoring malformed source collection.")
+            return formatted_sources
 
         for source in sources:
-            title = source.get("title", "")
-            url = source.get("url", "")
-
-            if not title or url in seen_urls:
+            if not isinstance(source, dict):
+                logger.warning("Skipping malformed source metadata.")
                 continue
 
-            seen_urls.add(url)
+            title = source.get("title", "")
+            url = source.get("url", "")
+            source_path = source.get("source_path", "")
+            source_key = (
+                url,
+                source_path,
+                title,
+                source.get("rank"),
+            )
+
+            if source_key in seen_sources:
+                continue
+
+            seen_sources.add(source_key)
             formatted_sources.append(
                 {
                     "title": title,
                     "url": url,
                     "category": source.get("category", ""),
+                    "document_type": source.get(
+                        "document_type",
+                        "faq",
+                    ),
+                    "source_path": source_path,
+                    # Preserve retrieval diagnostics for Developer Mode.
+                    "rank": source.get("rank"),
+                    "score": source.get("score"),
+                    "similarity": source.get("similarity"),
+                    "confidence": source.get("confidence"),
+                    "page_number": source.get("page_number"),
+                    "section_title": source.get("section_title", ""),
                 }
             )
 
@@ -263,7 +265,10 @@ class NYSCChatService:
         ):
             return True
 
-        return len(words) < 10
+        # A short standalone question is not automatically a follow-up.
+        # Only questions with an explicit reference word or phrase above
+        # should reuse the previous topic.
+        return False
 
     def resolve_follow_up_question(self, question: str) -> str:
         """Add the previous topic to a likely follow-up retrieval query."""
@@ -361,6 +366,10 @@ class NYSCChatService:
             if cached_response.get("topic"):
                 self.last_topic = cached_response["topic"]
 
+            logger.info(
+                "Response cache used | response_mode=%s",
+                response_mode,
+            )
             return cached_response
 
         start_time = time.perf_counter()
@@ -393,11 +402,14 @@ class NYSCChatService:
 
             logger.info(
                 "Question processed | success=%s | confidence=%.2f | "
-                "response_time=%.2f | source_count=%d",
+                "response_time=%.2f | source_count=%d | "
+                "response_mode=%s | generation_mode=%s | cache_hit=false",
                 True,
                 confidence,
                 response_time,
                 len(formatted_sources),
+                response_mode,
+                result["generation_mode"],
             )
 
             service_response = {

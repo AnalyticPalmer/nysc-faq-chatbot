@@ -427,9 +427,36 @@ class NYSCChatService:
                 "cache_hit": False,
             }
 
-            if result["generation_mode"] != "unavailable":
+            answer_text = str(
+                result.get("answer", "")
+            ).strip()
+
+            uncacheable_answer_prefixes = (
+                "I could not find verified information",
+                "I found related NYSC documents",
+                "Sorry, I could not process your question",
+            )
+
+            should_cache_response = (
+                result.get("generation_mode") not in {
+                    "unavailable",
+                    "error",
+                }
+                and bool(answer_text)
+                and not answer_text.startswith(
+                    uncacheable_answer_prefixes
+                )
+            )
+
+            if should_cache_response:
                 self.response_cache[cache_key] = (
                     service_response.copy()
+                )
+            else:
+                logger.info(
+                    "Response not cached | generation_mode=%s | "
+                    "reason=unavailable_or_incomplete_answer",
+                    result.get("generation_mode", "unknown"),
                 )
 
             return service_response

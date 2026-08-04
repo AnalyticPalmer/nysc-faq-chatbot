@@ -1,5 +1,6 @@
 """Professional Streamlit interface for the NYSC FAQ Chatbot."""
 
+import base64
 import json
 import os
 import sys
@@ -20,8 +21,74 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.chat_service import NYSCChatService
 
 
+# Local branding assets are optional so a missing logo never blocks startup.
+LOGO_PATH = Path(__file__).resolve().parent / "assets" / "nysc_logo.png"
+
+
+def load_logo_data_uri() -> str | None:
+    """Return the local transparent PNG as a data URI when available."""
+    try:
+        if not LOGO_PATH.is_file() or LOGO_PATH.stat().st_size <= 0:
+            return None
+
+        logo_bytes = LOGO_PATH.read_bytes()
+        if not logo_bytes:
+            return None
+
+        encoded_logo = base64.b64encode(logo_bytes).decode("ascii")
+    except OSError:
+        return None
+
+    return f"data:image/png;base64,{encoded_logo}"
+
+
+def build_branded_header(logo_data_uri: str | None) -> str:
+    """Build accessible, theme-aware NYSC assistant header markup.
+
+    The HTML is returned without leading indentation so Streamlit renders
+    it as HTML instead of a Markdown code block.
+    """
+    logo_markup = ""
+
+    if logo_data_uri:
+        logo_markup = (
+            f'<img class="brand-logo" src="{logo_data_uri}" '
+            'alt="NYSC emblem">'
+        )
+
+    return (
+        '<div class="app-header">'
+        f'{logo_markup}'
+        '<div class="brand-copy">'
+        '<h1>NYSC FAQ Assistant</h1>'
+        '<p class="brand-subtitle">AI-Powered Knowledge Assistant</p>'
+        '<div class="brand-badges" '
+        'aria-label="Assistant capabilities">'
+        '<span>Verified FAQs</span>'
+        '<span>Official NYSC Documents</span>'
+        '<span>AI Answers</span>'
+        '</div>'
+        '</div>'
+        '</div>'
+    )
+
+
+logo_data_uri = load_logo_data_uri()
+
+# Safe status flags support Developer Mode without exposing paths or contents.
+try:
+    logo_file_found = LOGO_PATH.is_file() and LOGO_PATH.stat().st_size > 0
+except OSError:
+    logo_file_found = False
+logo_bytes_loaded = bool(logo_data_uri)
+logo_data_uri_created = bool(
+    logo_data_uri
+    and logo_data_uri.startswith("data:image/png;base64,")
+)
+
+
 st.set_page_config(
-    page_title="NYSC FAQ Chatbot",
+    page_title="NYSC FAQ Assistant",
     page_icon="💬",
     layout="wide",
 )
@@ -51,7 +118,14 @@ st.markdown(
     """
     <style>
     :root {
-        --nysc-green: var(--primary-color);
+        --nysc-brand-green: #0B6B3A;
+        --nysc-hover-green: #095C31;
+        --nysc-success-green: #198754;
+        --nysc-green: color-mix(
+            in srgb,
+            var(--nysc-brand-green) 88%,
+            var(--text-color)
+        );
         --nysc-green-soft: color-mix(
             in srgb,
             var(--primary-color) 14%,
@@ -78,6 +152,27 @@ st.markdown(
         max-width: 1180px;
         padding-top: 2rem;
         padding-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+        overflow-x: clip;
+    }
+
+    .nysc-watermark {
+        position: fixed;
+        right: 3vw;
+        bottom: 5vh;
+        width: min(34vw, 480px);
+        z-index: 0;
+        opacity: 0.05;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .nysc-watermark img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
     }
 
     h1, h2, h3 {
@@ -90,28 +185,90 @@ st.markdown(
     }
 
     .app-header {
+        display: flex;
+        align-items: center;
+        gap: 1.35rem;
         padding: 1.6rem 1.75rem;
         margin-bottom: 1rem;
-        border: 1px solid var(--nysc-border);
+        border: 1px solid color-mix(
+            in srgb,
+            var(--nysc-brand-green) 22%,
+            var(--nysc-border)
+        );
         border-radius: 1rem;
         background: linear-gradient(
             135deg,
             var(--background-color) 0%,
             var(--nysc-surface) 100%
         );
+        box-shadow: 0 8px 24px color-mix(
+            in srgb,
+            var(--nysc-brand-green) 10%,
+            transparent
+        );
+    }
+
+    .brand-logo {
+        display: block;
+        width: 82px;
+        height: 82px;
+        flex: 0 0 auto;
+        object-fit: contain;
+        opacity: 1;
+        user-select: none;
+    }
+
+    .brand-copy {
+        min-width: 0;
     }
 
     .app-header h1 {
-        margin: 0 0 0.4rem 0;
+        margin: 0 0 0.25rem 0;
+        color: color-mix(
+            in srgb,
+            var(--nysc-brand-green) 84%,
+            var(--text-color)
+        );
         font-size: 2.15rem;
     }
 
-    .app-header p {
+    .app-header .brand-subtitle {
         margin: 0;
-        max-width: 850px;
-        color: var(--text-color);
+        color: var(--nysc-text-muted);
         font-size: 1.02rem;
-        line-height: 1.65;
+        line-height: 1.5;
+    }
+
+    .brand-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 0.75rem;
+    }
+
+    .brand-badges span {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.3rem 0.65rem;
+        border: 1px solid color-mix(
+            in srgb,
+            var(--nysc-brand-green) 25%,
+            var(--nysc-border)
+        );
+        border-radius: 999px;
+        color: color-mix(
+            in srgb,
+            var(--nysc-brand-green) 72%,
+            var(--text-color)
+        );
+        background: color-mix(
+            in srgb,
+            var(--nysc-brand-green) 9%,
+            var(--background-color)
+        );
+        font-size: 0.78rem;
+        font-weight: 650;
+        line-height: 1.25;
     }
 
     div[data-testid="stMetric"] {
@@ -261,17 +418,56 @@ st.markdown(
         }
 
         .app-header {
+            align-items: flex-start;
+            gap: 0.9rem;
             padding: 1.25rem;
         }
 
+        .brand-logo {
+            width: 58px;
+            height: 58px;
+        }
+
         .app-header h1 {
-            font-size: 1.75rem;
+            font-size: 1.65rem;
+        }
+
+        .app-header .brand-subtitle {
+            font-size: 0.94rem;
+        }
+
+        .brand-badges {
+            gap: 0.35rem;
+        }
+
+        .brand-badges span {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.72rem;
+        }
+
+        .nysc-watermark {
+            right: -2rem;
+            bottom: 4rem;
+            width: min(60vw, 260px);
+            opacity: 0.025;
         }
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+# Use a real watermark element because Streamlit container pseudo-elements
+# can be obscured by framework background and stacking layers.
+if logo_data_uri:
+    st.markdown(
+        f"""
+        <div class="nysc-watermark" aria-hidden="true">
+            <img src="{logo_data_uri}" alt="">
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 @st.cache_resource
@@ -993,6 +1189,9 @@ active_model = chat_service.model_name
 
 
 with st.sidebar:
+    # Native Streamlit rendering reliably serves the local sidebar image.
+    if logo_file_found:
+        st.image(LOGO_PATH, width=60)
     st.header("NYSC FAQ Assistant")
 
     st.markdown('<div class="sidebar-label">About</div>', unsafe_allow_html=True)
@@ -1173,6 +1372,22 @@ with st.sidebar:
         ),
     )
 
+    # Branding diagnostics stay bounded and reveal no paths or image data.
+    if developer_mode:
+        with st.expander("Branding Diagnostics"):
+            st.write(
+                "Logo file found: "
+                f"{'Yes' if logo_file_found else 'No'}"
+            )
+            st.write(
+                "Logo bytes loaded: "
+                f"{'Yes' if logo_bytes_loaded else 'No'}"
+            )
+            st.write(
+                "Data URI created: "
+                f"{'Yes' if logo_data_uri_created else 'No'}"
+            )
+
     st.markdown(
         '<div class="sidebar-label">Session Statistics</div>',
         unsafe_allow_html=True,
@@ -1204,22 +1419,14 @@ with st.sidebar:
 
 
 st.markdown(
-    """
-    <div class="app-header">
-        <h1>NYSC FAQ Assistant</h1>
-        <p>
-            AI-powered Retrieval-Augmented Generation (RAG) Assistant
-            for answering common NYSC questions using verified information.
-        </p>
-    </div>
-    """,
+    build_branded_header(logo_data_uri),
     unsafe_allow_html=True,
 )
 
 st.info(
-    "This is an independent educational AI project and is not an "
-    "official NYSC platform. Confirm time-sensitive information through "
-    "official NYSC channels."
+    "**Disclaimer**\n\n"
+    "This is an independent educational AI project and is not affiliated "
+    "with or endorsed by the National Youth Service Corps (NYSC)."
 )
 
 

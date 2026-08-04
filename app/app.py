@@ -653,6 +653,33 @@ def _valid_source_records(value: object) -> list[dict]:
     return [source for source in value if isinstance(source, dict)]
 
 
+def _format_pdf_document_name(source: dict) -> str:
+    """Return a readable PDF title without exposing its source path."""
+    source_title = source.get("title")
+    if isinstance(source_title, str) and source_title.strip():
+        raw_name = source_title.strip()
+    else:
+        source_path = str(source.get("source_path") or "")
+        raw_name = Path(source_path.replace("\\", "/")).stem
+
+    words = raw_name.replace("_", " ").split()
+    minor_words = {
+        "a", "an", "and", "at", "by", "for",
+        "in", "of", "on", "the", "to",
+    }
+    formatted_words = []
+
+    for index, word in enumerate(words):
+        if word.isupper():
+            formatted_words.append(word)
+        elif index > 0 and word.lower() in minor_words:
+            formatted_words.append(word.lower())
+        else:
+            formatted_words.append(word.capitalize())
+
+    return " ".join(formatted_words) or "NYSC Document"
+
+
 def get_follow_up_questions(message: dict) -> list[str]:
     """Return up to three follow-up questions based on source categories."""
     category_questions = {
@@ -1058,7 +1085,6 @@ def display_assistant_message(
                         "document_type",
                         "faq",
                     )
-                    source_path = source.get("source_path", "")
                     page_number = source.get("page_number")
                     section_title = (
                         source.get("section_title")
@@ -1068,27 +1094,12 @@ def display_assistant_message(
 
                     with st.container(border=True):
                         if document_type == "pdf":
-                            filename = (
-                                Path(source_path).name
-                                if source_path
-                                else ""
-                            )
-                            st.caption(
-                                "Source type: Official PDF Document"
-                            )
+                            document_name = _format_pdf_document_name(source)
+                            st.markdown("**Source:** Official PDF Document")
                             st.markdown(
-                                "**Document title:** "
-                                f"{escape(str(title))}"
+                                "**Document:** "
+                                f"{escape(document_name)}"
                             )
-                            st.markdown(
-                                "**Category:** Official Document"
-                            )
-
-                            if filename:
-                                st.markdown(
-                                    "**Document file:** "
-                                    f"{escape(filename)}"
-                                )
 
                             if page_number not in (None, ""):
                                 st.markdown(

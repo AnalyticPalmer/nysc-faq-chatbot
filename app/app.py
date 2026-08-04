@@ -110,6 +110,125 @@ RESPONSE_MODE_OPTIONS = {
 RESPONSE_MODE_LABELS = {
     mode: label for label, mode in RESPONSE_MODE_OPTIONS.items()
 }
+TOPIC_GUIDES = {
+    "Registration": {
+        "description": "Guidance on creating, correcting, and completing an NYSC registration.",
+        "questions": [
+            "How do I register for NYSC?",
+            "How do I correct a mistake in my registration?",
+            "How can I print my NYSC green card?",
+            "Why is my registration incomplete?",
+        ],
+    },
+    "Mobilization": {
+        "description": "Information about institutional mobilization, the Senate list, and call-up letters.",
+        "questions": [
+            "What is the NYSC mobilization process?",
+            "How do I check the Senate list?",
+            "What happens after my name appears on the Senate list?",
+            "How can I print my call-up letter?",
+        ],
+    },
+    "Orientation Camp": {
+        "description": "What to expect before and during the NYSC orientation course.",
+        "questions": [
+            "What documents should I take to orientation camp?",
+            "What should I wear to orientation camp?",
+            "What happens if I miss orientation camp?",
+            "Can I leave camp before it ends?",
+        ],
+    },
+    "Camp Requirements": {
+        "description": "Documents, personal items, and restrictions relevant to orientation camp.",
+        "questions": [
+            "What items should I take to NYSC camp?",
+            "What items are prohibited in camp?",
+            "Can I take electronic devices to camp?",
+            "What documents are required in camp?",
+        ],
+    },
+    "Relocation": {
+        "description": "Guidance on relocation eligibility, applications, and status checks.",
+        "questions": [
+            "How can I apply for NYSC relocation?",
+            "What grounds are accepted for relocation?",
+            "How do I check my relocation status?",
+            "Can I apply for relocation after camp?",
+        ],
+    },
+    "Monthly Clearance": {
+        "description": "How monthly clearance works and why regular participation matters.",
+        "questions": [
+            "What is monthly clearance?",
+            "How do I complete monthly clearance?",
+            "What happens if I miss monthly clearance?",
+            "Why is monthly clearance important?",
+        ],
+    },
+    "Place of Primary Assignment (PPA)": {
+        "description": "Information about PPA posting, acceptance, rejection, and changes.",
+        "questions": [
+            "What is a PPA in NYSC?",
+            "Can I reject my PPA?",
+            "Can my PPA be changed?",
+            "What happens after receiving my PPA letter?",
+        ],
+    },
+    "Community Development Service (CDS)": {
+        "description": "Guidance on CDS participation, schedules, and attendance obligations.",
+        "questions": [
+            "What is CDS?",
+            "Is CDS compulsory?",
+            "How often does CDS take place?",
+            "What happens if I miss CDS?",
+        ],
+    },
+    "Passing Out": {
+        "description": "Information about completing service and receiving the national service certificate.",
+        "questions": [
+            "What happens during NYSC passing out?",
+            "How do I collect my NYSC certificate?",
+            "What happens if I miss passing out?",
+            "Who qualifies for the Certificate of National Service?",
+        ],
+    },
+    "Exemption": {
+        "description": "Eligibility and documentation for NYSC exemption certificates.",
+        "questions": [
+            "Who qualifies for NYSC exemption?",
+            "How do I collect an exemption certificate?",
+            "What documents are required for exemption?",
+            "Can an exempted graduate still serve?",
+        ],
+    },
+    "Foreign-Trained Graduates": {
+        "description": "Registration, document verification, and camp requirements for foreign-trained graduates.",
+        "questions": [
+            "What documents should a foreign-trained graduate present?",
+            "Must original documents be presented in camp?",
+            "How are foreign certificates verified?",
+            "What are the registration requirements for foreign-trained graduates?",
+        ],
+    },
+    "Portal Support": {
+        "description": "Help with portal access, password recovery, reprints, and registration errors.",
+        "questions": [
+            "How do I reset my NYSC portal password?",
+            "What should I do when the NYSC portal is unavailable?",
+            "Can I reprint my call-up letter?",
+            "How do I correct portal registration errors?",
+        ],
+    },
+    "NYSC Bye-Laws and Official Documents": {
+        "description": "Explore verified rules, offences, penalties, and official NYSC policy documents.",
+        "questions": [
+            "What happens when a corps member travels outside the state without permission?",
+            "What offences can lead to extension of service?",
+            "What offences can lead to decampment?",
+            "What does the NYSC sexual harassment policy say?",
+        ],
+    },
+}
 
 
 # Internal styling keeps the app self-contained and preserves Streamlit
@@ -1182,6 +1301,8 @@ except Exception:
 # Keep the existing conversation state available across Streamlit reruns.
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "selected_topic" not in st.session_state:
+    st.session_state.selected_topic = None
 
 
 _, retrieval_accuracy = load_dashboard_data()
@@ -1197,6 +1318,7 @@ average_response_time = calculate_average_response_time(
     average_confidence,
 ) = calculate_session_statistics(st.session_state.messages)
 active_model = chat_service.model_name
+selected_question = None
 
 
 with st.sidebar:
@@ -1218,23 +1340,13 @@ with st.sidebar:
         '<div class="sidebar-label">Supported Topics</div>',
         unsafe_allow_html=True,
     )
-    st.markdown(
-        """
-        - Registration
-        - Mobilization
-        - Orientation Camp
-        - Camp Requirements
-        - Relocation
-        - Monthly Clearance
-        - Place of Primary Assignment (PPA)
-        - Community Development Service (CDS)
-        - Passing Out
-        - Exemption
-        - Foreign-Trained Graduates
-        - Portal Support
-        - NYSC Bye-Laws and Official Documents
-        """
-    )
+    for topic_index, topic_name in enumerate(TOPIC_GUIDES):
+        if st.button(
+            topic_name,
+            key=f"supported_topic_{topic_index}",
+            use_container_width=True,
+        ):
+            st.session_state.selected_topic = topic_name
 
     st.markdown(
         '<div class="sidebar-label">Knowledge Base</div>',
@@ -1457,6 +1569,41 @@ with metric_columns[3]:
     st.metric("AI Model", active_model)
 
 
+selected_topic = st.session_state.selected_topic
+if selected_topic in TOPIC_GUIDES:
+    topic_guide = TOPIC_GUIDES[selected_topic]
+
+    st.markdown(
+        '<div class="section-label">Topic Overview</div>',
+        unsafe_allow_html=True,
+    )
+    with st.container(border=True):
+        st.caption("Topic Guide")
+        st.subheader(selected_topic)
+        st.write(topic_guide["description"])
+        st.markdown("**Related Questions**")
+
+        for question_index, topic_question in enumerate(
+            topic_guide["questions"]
+        ):
+            if st.button(
+                topic_question,
+                key=(
+                    f"topic_question_{selected_topic}_{question_index}"
+                ),
+                use_container_width=True,
+            ):
+                selected_question = topic_question
+
+        if st.button(
+            "Close Topic",
+            key="close_selected_topic",
+            use_container_width=True,
+        ):
+            st.session_state.selected_topic = None
+            st.rerun()
+
+
 st.markdown(
     '<div class="section-label">Quick questions</div>',
     unsafe_allow_html=True,
@@ -1477,7 +1624,6 @@ quick_questions = {
     ),
 }
 
-selected_question = None
 quick_question_columns = st.columns(4)
 
 for index, (button_label, predefined_question) in enumerate(

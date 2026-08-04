@@ -30,7 +30,7 @@ Grounding generation in verified FAQs and official NYSC documents reduces unsupp
 
 ## Key features
 
-### 🤖 AI and retrieval
+###  AI and retrieval
 
 - Retrieval-Augmented Generation with source-grounded prompts
 - Google Gemini answer generation (`gemini-3.6-flash` by default)
@@ -40,7 +40,7 @@ Grounding generation in verified FAQs and official NYSC documents reduces unsupp
 - Hybrid retrieval reranking across FAQ and PDF evidence
 - Automatic verified-retrieval fallback when Gemini is unavailable
 
-### 📚 Knowledge base
+###  Knowledge base
 
 - Verified NYSC FAQ JSON data
 - Official NYSC PDF documents
@@ -49,7 +49,7 @@ Grounding generation in verified FAQs and official NYSC documents reduces unsupp
 - Registration guide for foreign-trained prospective corps members
 - Page-aware and section-aware PDF source metadata
 
-### 🔎 OCR workflow
+###  OCR workflow
 
 - Offline scanned-document detection
 - OCRmyPDF processing workflow
@@ -61,7 +61,7 @@ Grounding generation in verified FAQs and official NYSC documents reduces unsupp
 > [!NOTE]
 > `ocr_scanned_pdfs.py` imports PyMuPDF (`fitz`) and invokes OCRmyPDF, but those packages are not currently listed in `requirements.txt`. OCRmyPDF also requires a working Tesseract installation. These are optional offline ingestion prerequisites; normal Streamlit startup does not run OCR.
 
-### ✨ User experience
+###  User experience
 
 - Theme-aware light and dark interfaces
 - Responsive desktop and mobile layout
@@ -75,7 +75,7 @@ Grounding generation in verified FAQs and official NYSC documents reduces unsupp
 - Developer Mode with safe retrieval and generation diagnostics
 - Local-only knowledge-base refresh control
 
-### 🛠️ Engineering
+###  Engineering
 
 - Modular Python architecture
 - Structured application logging
